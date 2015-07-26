@@ -5,7 +5,7 @@ import java.util.Optional;
 /**
  * Created by ralph on 08/07/15.
  */
-public class User {
+public class User implements Chat {
     private int id;
     private String first_name;
     private Optional<String> last_name;

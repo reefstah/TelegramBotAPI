@@ -1,11 +1,14 @@
 package codespartans.telegram.bot;
 
+import codespartans.telegram.bot.models.Update;
 import codespartans.telegram.bot.models.User;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by ralph on 08/07/15.
@@ -35,5 +38,12 @@ public class TelegramBotIntegrationTest {
         TelegramBot bot = TelegramBot.getInstance(token);
         User user = bot.getMe();
         Assert.assertNotNull(user);
+    }
+
+    @Test
+    public void getUpdates() throws IOException {
+        TelegramBot bot = TelegramBot.getInstance(token);
+        List<Update> updates = bot.getUpdates(Optional.empty(), Optional.empty(), Optional.empty());
+        Assert.assertNotNull(updates);
     }
 }

@@ -1,23 +1,24 @@
 package codespartans.telegram.bot;
 
-import codespartans.telegram.bot.models.Response;
-import codespartans.telegram.bot.models.User;
+import codespartans.telegram.bot.models.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.fluent.Form;
 import org.apache.http.client.fluent.Request;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 /**
  * Implementation of Telegrams bot api.
  *
  * @author Ralph Broers
- * @
+ *
  */
 public class TelegramBot {
 
@@ -57,6 +58,24 @@ public class TelegramBot {
     public User getMe() throws IOException {
         return Request.Get(String.format("%sgetMe", tokenizedApiUrl)).execute()
                 .handleResponse(getResponseHandler(new TypeReference<Response<User>>() {
+                }));
+    }
+
+    public Message sendMessage(int chat_id,
+                               String text,
+                               Optional<Boolean> disable_web_page_preview,
+                               Optional<Integer> reply_to_message_id,
+                               Optional<Reply> reply_markup) throws IOException {
+        return Request.Post(String.format("%sendMessage", tokenizedApiUrl))
+                .bodyForm(Form.form().add("chat_id", String.valueOf(chat_id)).add("text", text).build())
+                .execute()
+                .handleResponse(getResponseHandler(new TypeReference<Response<Message>>() {
+                }));
+    }
+
+    public List<Update> getUpdates(Optional<Integer> offset, Optional<Integer> limit, Optional<Integer> timeout) throws IOException {
+        return Request.Get(String.format("%sgetUpdates", tokenizedApiUrl)).execute()
+                .handleResponse(getResponseHandler(new TypeReference<Response<List<Update>>>() {
                 }));
     }
 
