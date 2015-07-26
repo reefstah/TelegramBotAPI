@@ -1,7 +1,7 @@
-package codespartans.telegram.bot;
+package org.codespartans.telegram.bot;
 
-import codespartans.telegram.bot.models.Update;
-import codespartans.telegram.bot.models.User;
+import org.codespartans.telegram.bot.models.Update;
+import org.codespartans.telegram.bot.models.User;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;

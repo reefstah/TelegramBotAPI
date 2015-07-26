@@ -1,4 +1,4 @@
-package codespartans.telegram.bot;
+package org.codespartans.telegram.bot;
 
 /**
  * Created by ralph on 08/07/15.

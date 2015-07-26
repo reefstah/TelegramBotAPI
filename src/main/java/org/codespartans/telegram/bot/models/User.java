@@ -1,4 +1,4 @@
-package codespartans.telegram.bot.models;
+package org.codespartans.telegram.bot.models;
 
 import java.util.Optional;
 

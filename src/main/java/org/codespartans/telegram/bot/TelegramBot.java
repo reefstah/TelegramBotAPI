@@ -1,6 +1,5 @@
-package codespartans.telegram.bot;
+package org.codespartans.telegram.bot;
 
-import codespartans.telegram.bot.models.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -9,6 +8,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.fluent.Form;
 import org.apache.http.client.fluent.Request;
+import org.codespartans.telegram.bot.models.*;
 
 import java.io.IOException;
 import java.util.List;

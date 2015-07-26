@@ -1,12 +1,12 @@
-package codespartans.telegram.bot;
+package org.codespartans.telegram.bot;
 
-import codespartans.telegram.bot.models.Chat;
-import codespartans.telegram.bot.models.GroupChat;
-import codespartans.telegram.bot.models.User;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import org.codespartans.telegram.bot.models.Chat;
+import org.codespartans.telegram.bot.models.GroupChat;
+import org.codespartans.telegram.bot.models.User;
 
 import java.io.IOException;
 

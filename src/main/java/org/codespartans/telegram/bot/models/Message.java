@@ -1,7 +1,7 @@
-package codespartans.telegram.bot.models;
+package org.codespartans.telegram.bot.models;
 
-import codespartans.telegram.bot.ChatDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.codespartans.telegram.bot.ChatDeserializer;
 
 import java.util.List;
 import java.util.Optional;
