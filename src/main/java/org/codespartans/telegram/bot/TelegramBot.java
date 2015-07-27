@@ -4,13 +4,18 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.fluent.Form;
 import org.apache.http.client.fluent.Request;
+import org.apache.http.client.utils.URIBuilder;
 import org.codespartans.telegram.bot.models.*;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,16 +23,20 @@ import java.util.Optional;
  * Implementation of Telegrams bot api.
  *
  * @author Ralph Broers
- *
  */
 public class TelegramBot {
 
     private static final ObjectMapper mapper = new ObjectMapper().registerModule(new Jdk8Module());
-    private static final String APIURL = "https://api.telegram.org/bot";
-    private final String tokenizedApiUrl;
+    private static final String HOST = "api.telegram.org";
+    private static final String SCHEME = "https";
+    private final URI ApiUri;
 
-    private TelegramBot(String token) {
-        this.tokenizedApiUrl = String.format("%s%s/", APIURL, token);
+    private TelegramBot(String token) throws URISyntaxException {
+        this.ApiUri = new URIBuilder()
+                .setScheme(SCHEME)
+                .setHost(HOST)
+                .setPath(String.format("/bot%s/", token))
+                .build();
     }
 
     /**
@@ -37,14 +46,16 @@ public class TelegramBot {
      * @param token
      * @return Returns an instance of TelegramBot
      * @throws NullPointerException when inserting null as token
-     * @throws NullPointerException when inserting null as token
      * @See NullPointerException
      */
     public static TelegramBot getInstance(String token) {
         token = Optional.ofNullable(token)
                 .orElseThrow(() -> new NullPointerException("Don't put null in my API's im nullergic"));
-
-        return new TelegramBot(token);
+        try {
+            return new TelegramBot(token);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -56,7 +67,8 @@ public class TelegramBot {
      * @throws IOException             in case of a problem or the connection was aborted
      */
     public User getMe() throws IOException {
-        return Request.Get(String.format("%sgetMe", tokenizedApiUrl)).execute()
+        return Request.Get(ApiUri.resolve("getMe"))
+                .execute()
                 .handleResponse(getResponseHandler(new TypeReference<Response<User>>() {
                 }));
     }
@@ -66,15 +78,54 @@ public class TelegramBot {
                                Optional<Boolean> disable_web_page_preview,
                                Optional<Integer> reply_to_message_id,
                                Optional<Reply> reply_markup) throws IOException {
-        return Request.Post(String.format("%sendMessage", tokenizedApiUrl))
+        return Request.Post(ApiUri.resolve("sendMessage"))
                 .bodyForm(Form.form().add("chat_id", String.valueOf(chat_id)).add("text", text).build())
                 .execute()
                 .handleResponse(getResponseHandler(new TypeReference<Response<Message>>() {
                 }));
     }
 
-    public List<Update> getUpdates(Optional<Integer> offset, Optional<Integer> limit, Optional<Integer> timeout) throws IOException {
-        return Request.Get(String.format("%sgetUpdates", tokenizedApiUrl)).execute()
+    public List<Update> getUpdates(int offset, int limit, int timeout) throws IOException {
+        List<NameValuePair> nvps = Form.form()
+                .add("offset", String.valueOf(offset))
+                .add("limit", String.valueOf(limit))
+                .add("timeout", String.valueOf(timeout))
+                .build();
+        return getUpdates(nvps);
+    }
+
+    public List<Update> getUpdates(int offset, int limit) throws IOException {
+        List<NameValuePair> nvps = Form.form()
+                .add("offset", String.valueOf(offset))
+                .add("limit", String.valueOf(limit))
+                .build();
+        return getUpdates(nvps);
+    }
+
+    public List<Update> getUpdates(int timeout) throws IOException {
+        List<NameValuePair> nvps = Form.form()
+                .add("timeout", String.valueOf(timeout))
+                .build();
+        return getUpdates(nvps);
+    }
+
+    public List<Update> getUpdates() throws IOException {
+        return getUpdates(Collections.emptyList());
+    }
+
+    private List<Update> getUpdates(List<NameValuePair> nvps) throws IOException {
+        URI uri;
+
+        try {
+            uri = new URIBuilder(ApiUri.resolve("getUpdates"))
+                    .addParameters(nvps)
+                    .build();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+
+        return Request.Get(uri)
+                .execute()
                 .handleResponse(getResponseHandler(new TypeReference<Response<List<Update>>>() {
                 }));
     }
