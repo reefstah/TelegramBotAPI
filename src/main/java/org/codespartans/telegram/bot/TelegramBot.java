@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.fluent.Form;
 import org.apache.http.client.fluent.Request;
@@ -20,7 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Implementation of Telegrams bot api.
+ * Implementation of Telegrams bot API.
  *
  * @author Ralph Broers
  */
@@ -45,8 +47,6 @@ public class TelegramBot {
      *
      * @param token
      * @return Returns an instance of TelegramBot
-     * @throws NullPointerException when inserting null as token
-     * @See NullPointerException
      */
     public static TelegramBot getInstance(String token) {
         token = Optional.ofNullable(token)
@@ -85,7 +85,25 @@ public class TelegramBot {
                 }));
     }
 
+    /**
+     * Use this method to receive incoming updates using long polling (wiki). An Array of Update objects is returned.
+     *
+     * @param offset  Identifier of the first update to be returned. Must be greater by one than the highest among the identifiers of previously received updates. By default, updates starting with the earliest unconfirmed update are returned. An update is considered confirmed as soon as getUpdates is called with an offset higher than its update_id.
+     * @param limit   Limits the number of updates to be retrieved. Values between 1—100 are accepted. Defaults to 100
+     * @param timeout Timeout in seconds for long polling. Defaults to 0, i.e. usual short polling
+     * @return List of updates
+     * @throws IOException
+     */
     public List<Update> getUpdates(int offset, int limit, int timeout) throws IOException {
+        offset = Optional.ofNullable(offset)
+                .orElseThrow(() -> new NullPointerException("Don't put null in my API's im nullergic"));
+
+        limit = Optional.ofNullable(limit)
+                .orElseThrow(() -> new NullPointerException("Don't put null in my API's im nullergic"));
+
+        timeout = Optional.ofNullable(timeout)
+                .orElseThrow(() -> new NullPointerException("Don't put null in my API's im nullergic"));
+
         List<NameValuePair> nvps = Form.form()
                 .add("offset", String.valueOf(offset))
                 .add("limit", String.valueOf(limit))
@@ -94,7 +112,21 @@ public class TelegramBot {
         return getUpdates(nvps);
     }
 
+    /**
+     * Use this method to receive incoming updates using long polling (wiki). An Array of Update objects is returned.
+     *
+     * @param offset Identifier of the first update to be returned. Must be greater by one than the highest among the identifiers of previously received updates. By default, updates starting with the earliest unconfirmed update are returned. An update is considered confirmed as soon as getUpdates is called with an offset higher than its update_id.
+     * @param limit Limits the number of updates to be retrieved. Values between 1—100 are accepted. Defaults to 100
+     * @return List of updates
+     * @throws IOException
+     */
     public List<Update> getUpdates(int offset, int limit) throws IOException {
+        offset = Optional.ofNullable(offset)
+                .orElseThrow(() -> new NullPointerException("Don't put null in my API's im nullergic"));
+
+        limit = Optional.ofNullable(limit)
+                .orElseThrow(() -> new NullPointerException("Don't put null in my API's im nullergic"));
+
         List<NameValuePair> nvps = Form.form()
                 .add("offset", String.valueOf(offset))
                 .add("limit", String.valueOf(limit))
@@ -102,15 +134,59 @@ public class TelegramBot {
         return getUpdates(nvps);
     }
 
+    /**
+     * Use this method to receive incoming updates using long polling (wiki). An Array of Update objects is returned.
+     *
+     * @param timeout Timeout in seconds for long polling. Defaults to 0, i.e. usual short polling
+     * @return List of updates
+     * @throws IOException
+     */
     public List<Update> getUpdates(int timeout) throws IOException {
+        timeout = Optional.ofNullable(timeout)
+                .orElseThrow(() -> new NullPointerException("Don't put null in my API's im nullergic"));
+
         List<NameValuePair> nvps = Form.form()
                 .add("timeout", String.valueOf(timeout))
                 .build();
         return getUpdates(nvps);
     }
 
+    /**
+     * Use this method to receive incoming updates using long polling (wiki). An Array of Update objects is returned.
+     *
+     * @return List of updates
+     * @throws IOException
+     */
     public List<Update> getUpdates() throws IOException {
         return getUpdates(Collections.emptyList());
+    }
+
+    /**
+     * Use this method to specify a url and receive incoming updates via an outgoing webhook.
+     * Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url,
+     * containing a JSON-serialized Update. In case of an unsuccessful request,
+     * we will give up after a reasonable amount of attempts.
+     * <p>
+     * If you'd like to make sure that the Webhook request comes from Telegram,
+     * we recommend using a secret path in the URL, e.g. www.example.com/<token>.
+     * Since nobody else knows your bot‘s token, you can be pretty sure it’s us.
+     *
+     * @param url HTTPS url to send updates to. Use an empty string to remove webhook integration
+     * @throws IOException
+     * @throws HttpResponseException if the post is unsuccessful.
+     */
+    public void setWebHook(String url) throws IOException {
+        url = Optional.ofNullable(url)
+                .orElseThrow(() -> new NullPointerException("Don't put null in my API's im nullergic"));
+
+        StatusLine statusLine = Request.Post(ApiUri.resolve("setWebHook"))
+                .bodyForm(Form.form().add("url", url).build())
+                .execute()
+                .returnResponse()
+                .getStatusLine();
+
+        if (!(statusLine.getStatusCode() == 200))
+            throw new HttpResponseException(statusLine.hashCode(), statusLine.getReasonPhrase());
     }
 
     private List<Update> getUpdates(List<NameValuePair> nvps) throws IOException {
@@ -133,11 +209,10 @@ public class TelegramBot {
     private <T> ResponseHandler<T> getResponseHandler(TypeReference<Response<T>> reference) {
         return (HttpResponse response) -> {
             int code = response.getStatusLine().getStatusCode();
-            if (code == 404) throw new TelegramBotApiRuntimeException("API out of date.");
-            if (code == 500) throw new ClientProtocolException("Telegram servers having issues.");
+            if (code == 404) throw new HttpResponseException(400, "Telegram bot API out of date.");
             Response<T> entityResponse = mapper.readValue(response.getEntity().getContent(), reference);
             if (entityResponse.isOk() && entityResponse.getResult() != null) return entityResponse.getResult();
-            throw new TelegramBotApiRuntimeException(String.format("error_code: %s description: %s", entityResponse.getError_code(), entityResponse.getDescription()));
+            throw new HttpResponseException(code, response.getStatusLine().getReasonPhrase());
         };
     }
 }
