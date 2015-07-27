@@ -52,7 +52,7 @@ public class TelegramBot {
      */
     public static TelegramBot getInstance(String token) {
         token = Optional.ofNullable(token)
-                .orElseThrow(() -> new NullPointerException("Don't put null in my API's im nullergic"));
+                .orElseThrow(() -> new NullPointerException("Token can't be null."));
         try {
             return new TelegramBot(token);
         } catch (URISyntaxException e) {
@@ -74,13 +74,45 @@ public class TelegramBot {
                 }));
     }
 
+    /**
+     * Use this method to send text messages.
+     *
+     * @param chat_id Unique identifier for the message recipient — User or GroupChat id
+     * @param text    Text of the message to be sent
+     * @return On success, the sent <a href="https://core.telegram.org/bots/api#message">Message</a> is returned.
+     * @throws IOException
+     * @throws HttpResponseException
+     */
+    public Message sendMessage(int chat_id, String text) throws IOException {
+        return sendMessage(chat_id, text, Optional.empty(), Optional.empty(), Optional.empty());
+    }
+
+    /**
+     * Use this method to send text messages.
+     *
+     * @param chat_id                  Unique identifier for the message recipient — User or GroupChat id
+     * @param text                     Text of the message to be sent
+     * @param disable_web_page_preview Disables link previews for links in this message
+     * @param reply_to_message_id      If the message is a reply, ID of the original message
+     * @param reply_markup             Additional interface options.
+     *                                 A JSON-serialized object for a <a href="https://core.telegram.org/bots#keyboards">custom reply keyboard</a>,
+     *                                 instructions to hide keyboard or to force a reply from the user.
+     * @return On success, the sent <a href="https://core.telegram.org/bots/api#message">Message</a> is returned.
+     * @throws IOException
+     * @throws HttpResponseException
+     */
     public Message sendMessage(int chat_id,
                                String text,
                                Optional<Boolean> disable_web_page_preview,
                                Optional<Integer> reply_to_message_id,
                                Optional<Reply> reply_markup) throws IOException {
+
+        if (text == null || disable_web_page_preview == null || reply_to_message_id == null || reply_markup == null)
+            throw new NullPointerException("No null params allowed in sendMessage.");
+
+        Form form = Form.form().add("chat_id", String.valueOf(chat_id)).add("text", text);
         return Request.Post(ApiUri.resolve("sendMessage"))
-                .bodyForm(Form.form().add("chat_id", String.valueOf(chat_id)).add("text", text).build())
+                .bodyForm(form.build())
                 .execute()
                 .handleResponse(getResponseHandler(new TypeReference<Response<Message>>() {
                 }));
@@ -104,14 +136,6 @@ public class TelegramBot {
      * @throws HttpResponseException
      */
     public List<Update> getUpdates(int offset, int limit, int timeout) throws IOException {
-        offset = Optional.ofNullable(offset)
-                .orElseThrow(() -> new NullPointerException("Don't put null in my API's im nullergic"));
-
-        limit = Optional.ofNullable(limit)
-                .orElseThrow(() -> new NullPointerException("Don't put null in my API's im nullergic"));
-
-        timeout = Optional.ofNullable(timeout)
-                .orElseThrow(() -> new NullPointerException("Don't put null in my API's im nullergic"));
 
         List<NameValuePair> nvps = Form.form()
                 .add("offset", String.valueOf(offset))
@@ -138,11 +162,6 @@ public class TelegramBot {
      * @throws HttpResponseException
      */
     public List<Update> getUpdates(int offset, int limit) throws IOException {
-        offset = Optional.ofNullable(offset)
-                .orElseThrow(() -> new NullPointerException("Don't put null in my API's im nullergic"));
-
-        limit = Optional.ofNullable(limit)
-                .orElseThrow(() -> new NullPointerException("Don't put null in my API's im nullergic"));
 
         List<NameValuePair> nvps = Form.form()
                 .add("offset", String.valueOf(offset))
@@ -164,8 +183,6 @@ public class TelegramBot {
      * @throws HttpResponseException
      */
     public List<Update> getUpdates(int timeout) throws IOException {
-        timeout = Optional.ofNullable(timeout)
-                .orElseThrow(() -> new NullPointerException("Don't put null in my API's im nullergic"));
 
         List<NameValuePair> nvps = Form.form()
                 .add("timeout", String.valueOf(timeout))
@@ -205,11 +222,11 @@ public class TelegramBot {
      *
      * @param url HTTPS url to send updates to. Use an empty string to remove webhook integration
      * @throws IOException
-     * @throws HttpResponseException if the post is unsuccessful.
+     * @throws HttpResponseException
      */
     public void setWebHook(String url) throws IOException {
         url = Optional.ofNullable(url)
-                .orElseThrow(() -> new NullPointerException("Don't put null in my API's im nullergic"));
+                .orElseThrow(() -> new NullPointerException("Url can't be null."));
 
         StatusLine statusLine = Request.Post(ApiUri.resolve("setWebHook"))
                 .bodyForm(Form.form().add("url", url).build())
