@@ -50,7 +50,7 @@ public class TelegramBotIntegrationTest {
     @Test
     public void getUpdatesWithTimeOut() throws IOException {
         TelegramBot bot = TelegramBot.getInstance(token);
-        List<Update> updates = bot.getUpdates(60);
+        List<Update> updates = bot.getUpdates(10);
         Assert.assertNotNull(updates);
     }
 
