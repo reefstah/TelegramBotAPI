@@ -1,8 +1,10 @@
 package org.codespartans.telegram.bot;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
@@ -11,8 +13,10 @@ import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.fluent.Form;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.ContentType;
 import org.codespartans.telegram.bot.models.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -110,6 +114,8 @@ public class TelegramBot {
         if (text == null || disable_web_page_preview == null || reply_to_message_id == null || reply_markup == null)
             throw new NullPointerException("No null params allowed in sendMessage.");
 
+        if (chat_id == 0) throw new IllegalArgumentException("Parameter chat_id shouldn't be zero.");
+
         Form form = Form.form().add("chat_id", String.valueOf(chat_id)).add("text", text);
         return Request.Post(ApiUri.resolve("sendMessage"))
                 .bodyForm(form.build())
@@ -137,6 +143,9 @@ public class TelegramBot {
      */
     public List<Update> getUpdates(int offset, int limit, int timeout) throws IOException {
 
+        if (limit == 0 || timeout == 0)
+            throw new IllegalArgumentException("Parameters limit and timeout shouldn't be zero.");
+
         List<NameValuePair> nvps = Form.form()
                 .add("offset", String.valueOf(offset))
                 .add("limit", String.valueOf(limit))
@@ -163,6 +172,8 @@ public class TelegramBot {
      */
     public List<Update> getUpdates(int offset, int limit) throws IOException {
 
+        if (limit == 0) throw new IllegalArgumentException("Parameter limit shouldn't be zero.");
+
         List<NameValuePair> nvps = Form.form()
                 .add("offset", String.valueOf(offset))
                 .add("limit", String.valueOf(limit))
@@ -183,6 +194,8 @@ public class TelegramBot {
      * @throws HttpResponseException
      */
     public List<Update> getUpdates(int timeout) throws IOException {
+
+        if (timeout == 0) throw new IllegalArgumentException("Parameter timeout shouldn't be zero.");
 
         List<NameValuePair> nvps = Form.form()
                 .add("timeout", String.valueOf(timeout))
@@ -238,6 +251,76 @@ public class TelegramBot {
             throw new HttpResponseException(statusLine.hashCode(), statusLine.getReasonPhrase());
     }
 
+    /**
+     * Use this method to forward messages of any kind.
+     *
+     * @param chat_id      Unique identifier for the message recipient — User or GroupChat id
+     * @param from_chat_id Unique identifier for the chat where the original message was sent — User or GroupChat id
+     * @param message_id   Unique message identifier
+     * @return On success, the sent <a href="https://core.telegram.org/bots/api#message">Message</a> is returned.
+     * @throws IOException
+     * @throws HttpResponseException
+     */
+    public Message forwardMessage(int chat_id, int from_chat_id, int message_id) throws IOException {
+
+        if (chat_id == 0 || from_chat_id == 0 || message_id == 0)
+            throw new IllegalArgumentException("Parameters shouldn't be zero.");
+
+        Form form = Form.form()
+                .add("chat_id", String.valueOf(chat_id))
+                .add("from_chat_id", String.valueOf(from_chat_id))
+                .add("message_id", String.valueOf(message_id));
+
+        return Request.Post(ApiUri.resolve("forwardMessage"))
+                .bodyForm(form.build())
+                .execute()
+                .handleResponse(getResponseHandler(new TypeReference<Response<Message>>() {
+                }));
+    }
+
+    /**
+     * Use this method to send photos.
+     *
+     * @param chat_id             Unique identifier for the message recipient — User or GroupChat id
+     * @param photo               Photo to send.
+     *                            You can either pass a file_id as String to <a href="https://core.telegram.org/bots/api#resending-files-without-reuploading">resend</a> a photo that is already on the Telegram servers,
+     *                            or upload a new photo using multipart/form-data.
+     * @param caption             Photo caption (may also be used when resending photos by file_id).
+     * @param reply_to_message_id If the message is a reply, ID of the original message
+     * @param reply_markup        Additional interface options. A JSON-serialized object for a custom reply keyboard,
+     *                            instructions to hide keyboard or to force a reply from the user.
+     * @return Use this method to send photos.
+     * @throws IOException
+     * @throws HttpResponseException
+     */
+    public Message sendPhoto(int chat_id, File photo, Optional<String> caption, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
+
+        if (photo == null || caption == null || reply_to_message_id == null || reply_markup == null)
+            throw new NullPointerException("Parameters can't be null.");
+        if (chat_id == 0) throw new IllegalArgumentException("Parameter chat_id can't be zero.");
+        if (!photo.isFile() && photo.exists())
+            throw new IllegalArgumentException("Parameter photo must be an existing file.");
+
+        Form form = Form.form().add("chat_id", String.valueOf(chat_id));
+        caption.ifPresent(capt -> form.add("caption", capt));
+        reply_to_message_id.ifPresent(id -> form.add("reply_to_message_id", id.toString()));
+        reply_markup.ifPresent(reply -> {
+            try {
+                form.add("reply_markup", mapper.writeValueAsString(reply));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        return Request.Post(ApiUri.resolve("sendPhoto"))
+                .addHeader(HttpHeaders.CONTENT_TYPE, ContentType.MULTIPART_FORM_DATA.getMimeType())
+                .bodyFile(photo, ContentType.DEFAULT_BINARY)
+                .bodyForm(form.build())
+                .execute()
+                .handleResponse(getResponseHandler(new TypeReference<Response<Message>>() {
+                }));
+    }
+
     private List<Update> getUpdates(List<NameValuePair> nvps) throws IOException {
         URI uri;
 
@@ -258,9 +341,12 @@ public class TelegramBot {
     private <T> ResponseHandler<T> getResponseHandler(TypeReference<Response<T>> reference) {
         return (HttpResponse response) -> {
             int code = response.getStatusLine().getStatusCode();
-            if (code == 404) throw new HttpResponseException(400, "Telegram bot API out of date.");
-            Response<T> entityResponse = mapper.readValue(response.getEntity().getContent(), reference);
-            if (entityResponse.isOk() && entityResponse.getResult() != null) return entityResponse.getResult();
+            if (code == 404) throw new HttpResponseException(404, "Telegram bot API out of date.");
+            if (code == 200) {
+                Response<T> entityResponse = mapper.readValue(response.getEntity().getContent(), reference);
+                if (entityResponse.isOk() && entityResponse.getResult() != null) return entityResponse.getResult();
+                throw new NullPointerException();
+            }
             throw new HttpResponseException(code, response.getStatusLine().getReasonPhrase());
         };
     }

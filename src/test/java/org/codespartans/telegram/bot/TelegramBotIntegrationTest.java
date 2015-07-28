@@ -1,14 +1,17 @@
 package org.codespartans.telegram.bot;
 
+import org.codespartans.telegram.bot.models.Message;
 import org.codespartans.telegram.bot.models.Update;
 import org.codespartans.telegram.bot.models.User;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by ralph on 08/07/15.
@@ -50,7 +53,7 @@ public class TelegramBotIntegrationTest {
     @Test
     public void getUpdatesWithTimeOut() throws IOException {
         TelegramBot bot = TelegramBot.getInstance(token);
-        List<Update> updates = bot.getUpdates(10);
+        List<Update> updates = bot.getUpdates(5);
         Assert.assertNotNull(updates);
     }
 
@@ -59,6 +62,14 @@ public class TelegramBotIntegrationTest {
         TelegramBot bot = TelegramBot.getInstance(token);
         List<Update> updates = bot.getUpdates(5, 5);
         Assert.assertNotNull(updates);
+    }
+
+    @Test
+    public void sendPhoto() throws IOException {
+        TelegramBot bot = TelegramBot.getInstance(token);
+        File file = new File(this.getClass().getResource("/5411648.png").getPath());
+        Message message = bot.sendPhoto(24, file, Optional.empty(), Optional.empty(), Optional.empty());
+        Assert.assertNotNull(message);
     }
 
 }
