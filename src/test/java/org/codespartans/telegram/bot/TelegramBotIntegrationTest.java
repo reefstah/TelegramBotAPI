@@ -24,6 +24,7 @@ interface IntegrationTest {
 public class TelegramBotIntegrationTest {
 
     private static final String token = System.getenv("token");
+    private static final int groupChatId = Integer.valueOf(System.getenv("groupChatId"));
 
     @Test(expected = NullPointerException.class)
     public void getInstanceWithNullToken() {
@@ -68,7 +69,7 @@ public class TelegramBotIntegrationTest {
     public void sendPhoto() throws IOException {
         TelegramBot bot = TelegramBot.getInstance(token);
         File file = new File(this.getClass().getResource("/5411648.png").getPath());
-        Message message = bot.sendPhoto(24, file, Optional.empty(), Optional.empty(), Optional.empty());
+        Message message = bot.sendPhoto(groupChatId, file, Optional.empty(), Optional.empty(), Optional.empty());
         Assert.assertNotNull(message);
     }
 

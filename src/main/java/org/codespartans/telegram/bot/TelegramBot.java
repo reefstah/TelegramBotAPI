@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
@@ -13,7 +12,9 @@ import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.fluent.Form;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.FileBody;
 import org.codespartans.telegram.bot.models.*;
 
 import java.io.File;
@@ -301,24 +302,41 @@ public class TelegramBot {
         if (!photo.isFile() && photo.exists())
             throw new IllegalArgumentException("Parameter photo must be an existing file.");
 
-        Form form = Form.form().add("chat_id", String.valueOf(chat_id));
-        caption.ifPresent(capt -> form.add("caption", capt));
-        reply_to_message_id.ifPresent(id -> form.add("reply_to_message_id", id.toString()));
+        MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create()
+                .setMode(HttpMultipartMode.BROWSER_COMPATIBLE)
+                .addTextBody("chat_id", String.valueOf(chat_id))
+                .addPart("photo", new FileBody(photo));
+
+        caption.ifPresent(capt -> multipartEntityBuilder.addTextBody("caption", capt));
+        reply_to_message_id.ifPresent(id -> multipartEntityBuilder.addTextBody("reply_to_message_id", id.toString()));
         reply_markup.ifPresent(reply -> {
             try {
-                form.add("reply_markup", mapper.writeValueAsString(reply));
+                multipartEntityBuilder.addTextBody("reply_markup", mapper.writeValueAsString(reply));
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
         });
 
         return Request.Post(ApiUri.resolve("sendPhoto"))
-                .addHeader(HttpHeaders.CONTENT_TYPE, ContentType.MULTIPART_FORM_DATA.getMimeType())
-                .bodyFile(photo, ContentType.DEFAULT_BINARY)
-                .bodyForm(form.build())
+                .body(multipartEntityBuilder.build())
                 .execute()
                 .handleResponse(getResponseHandler(new TypeReference<Response<Message>>() {
                 }));
+    }
+
+    /**
+     * Use this method to send photos.
+     *
+     * @param chat_id Unique identifier for the message recipient — User or GroupChat id
+     * @param photo   Photo to send.
+     *                You can either pass a file_id as String to <a href="https://core.telegram.org/bots/api#resending-files-without-reuploading">resend</a> a photo that is already on the Telegram servers,
+     *                or upload a new photo using multipart/form-data.
+     * @return Use this method to send photos.
+     * @throws IOException
+     * @throws HttpResponseException
+     */
+    public Message sendPhoto(int chat_id, File photo) throws IOException {
+        return sendPhoto(chat_id, photo, Optional.empty(), Optional.empty(), Optional.empty());
     }
 
     private List<Update> getUpdates(List<NameValuePair> nvps) throws IOException {
