@@ -495,6 +495,72 @@ public class TelegramBot {
         return sendMedia("sendDocument", chat_id, document);
     }
 
+    /**
+     * Use this method to send general files.
+     *
+     * @param chat_id             Unique identifier for the message recipient — User or GroupChat id
+     * @param sticker             Sticker to send.
+     *                            You can either pass a file_id as String to <a href="https://core.telegram.org/bots/api#resending-files-without-reuploading">resend</a> a photo that is already on the Telegram servers,
+     *                            or upload a new sticker using multipart/form-data.
+     * @param reply_to_message_id If the message is a reply, ID of the original message
+     * @param reply_markup        Additional interface options. A JSON-serialized object for a <a href="https://core.telegram.org/bots#keyboards">custom reply keyboard</a>,
+     *                            instructions to hide keyboard or to force a reply from the user.
+     * @return On success, the sent <a href="https://core.telegram.org/bots/api#message">Message</a> is returned.
+     * @throws IOException
+     * @implNote Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+     */
+    public Message sendSticker(int chat_id, File sticker, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
+        return sendMedia("sendSticker", chat_id, sticker, reply_to_message_id, reply_markup, Collections.emptyList());
+    }
+
+    /**
+     * Use this method to send general files.
+     *
+     * @param chat_id Unique identifier for the message recipient — User or GroupChat id
+     * @param sticker Sticker to send.
+     *                You can either pass a file_id as String to <a href="https://core.telegram.org/bots/api#resending-files-without-reuploading">resend</a> a photo that is already on the Telegram servers,
+     *                or upload a new sticker using multipart/form-data.
+     * @return On success, the sent <a href="https://core.telegram.org/bots/api#message">Message</a> is returned.
+     * @throws IOException
+     * @implNote Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+     */
+    public Message sendSticker(int chat_id, File sticker) throws IOException {
+        return sendMedia("sendSticker", chat_id, sticker);
+    }
+
+    /**
+     * Use this method to send general files.
+     *
+     * @param chat_id             Unique identifier for the message recipient — User or GroupChat id
+     * @param sticker             Sticker to send.
+     *                            You can either pass a file_id as String to <a href="https://core.telegram.org/bots/api#resending-files-without-reuploading">resend</a> a photo that is already on the Telegram servers,
+     *                            or upload a new sticker using multipart/form-data.
+     * @param reply_to_message_id If the message is a reply, ID of the original message
+     * @param reply_markup        Additional interface options. A JSON-serialized object for a <a href="https://core.telegram.org/bots#keyboards">custom reply keyboard</a>,
+     *                            instructions to hide keyboard or to force a reply from the user.
+     * @return On success, the sent <a href="https://core.telegram.org/bots/api#message">Message</a> is returned.
+     * @throws IOException
+     * @implNote Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+     */
+    public Message sendSticker(int chat_id, String sticker, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
+        return sendMessage("sendSticker", chat_id, new BasicNameValuePair("sticker", sticker), reply_to_message_id, reply_markup, Collections.emptyList());
+    }
+
+    /**
+     * Use this method to send general files.
+     *
+     * @param chat_id Unique identifier for the message recipient — User or GroupChat id
+     * @param sticker Sticker to send.
+     *                You can either pass a file_id as String to <a href="https://core.telegram.org/bots/api#resending-files-without-reuploading">resend</a> a photo that is already on the Telegram servers,
+     *                or upload a new sticker using multipart/form-data.
+     * @return On success, the sent <a href="https://core.telegram.org/bots/api#message">Message</a> is returned.
+     * @throws IOException
+     * @implNote Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+     */
+    public Message sendSticker(int chat_id, String sticker) throws IOException {
+        return sendMessage("sendSticker", chat_id, new BasicNameValuePair("sticker", sticker));
+    }
+
     private Message sendMedia(String method, int chat_id, File media) throws IOException {
         return sendMedia(method, chat_id, media, Optional.empty(), Optional.empty(), Collections.emptyList());
     }
