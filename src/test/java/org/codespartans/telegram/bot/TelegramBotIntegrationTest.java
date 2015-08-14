@@ -25,6 +25,7 @@ public class TelegramBotIntegrationTest {
 
     private static final String token = System.getenv("token");
     private static final int groupChatId = Integer.valueOf(System.getenv("groupChatId"));
+    private static final String photoId = System.getenv("photoId");
 
     @Test(expected = NullPointerException.class)
     public void getInstanceWithNullToken() {
@@ -54,7 +55,7 @@ public class TelegramBotIntegrationTest {
     @Test
     public void getUpdatesWithTimeOut() throws IOException {
         TelegramBot bot = TelegramBot.getInstance(token);
-        List<Update> updates = bot.getUpdates(5);
+        List<Update> updates = bot.getUpdates(1);
         Assert.assertNotNull(updates);
     }
 
@@ -70,6 +71,21 @@ public class TelegramBotIntegrationTest {
         TelegramBot bot = TelegramBot.getInstance(token);
         File file = new File(this.getClass().getResource("/5411648.png").getPath());
         Message message = bot.sendPhoto(groupChatId, file, Optional.empty(), Optional.empty(), Optional.empty());
+        Assert.assertNotNull(message);
+    }
+
+    @Test
+    public void reSendPhoto() throws IOException {
+        TelegramBot bot = TelegramBot.getInstance(token);
+        Message message = bot.sendPhoto(groupChatId, photoId);
+        Assert.assertNotNull(message);
+    }
+
+    @Test
+    public void sendDocument() throws IOException {
+        TelegramBot bot = TelegramBot.getInstance(token);
+        File file = new File(this.getClass().getResource("/5411648.png").getPath());
+        Message message = bot.sendDocument(groupChatId, file);
         Assert.assertNotNull(message);
     }
 

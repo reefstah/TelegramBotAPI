@@ -14,12 +14,15 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.message.BasicNameValuePair;
 import org.codespartans.telegram.bot.models.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -116,12 +119,11 @@ public class TelegramBot {
 
         if (chat_id == 0) throw new IllegalArgumentException("Parameter chat_id shouldn't be zero.");
 
-        Form form = Form.form().add("chat_id", String.valueOf(chat_id)).add("text", text);
-        return Request.Post(ApiUri.resolve("sendMessage"))
-                .bodyForm(form.build())
-                .execute()
-                .handleResponse(getResponseHandler(new TypeReference<Response<Message>>() {
-                }));
+        List<BasicNameValuePair> extraFields = disable_web_page_preview
+                .map(preview -> Arrays.asList(new BasicNameValuePair("disable_web_page_preview", preview.toString())))
+                .orElseGet(() -> Collections.emptyList());
+
+        return sendMessage("sendMessage", chat_id, new BasicNameValuePair("text", text), reply_to_message_id, reply_markup, extraFields);
     }
 
     /**
@@ -289,15 +291,18 @@ public class TelegramBot {
      * @param reply_to_message_id If the message is a reply, ID of the original message
      * @param reply_markup        Additional interface options. A JSON-serialized object for a custom reply keyboard,
      *                            instructions to hide keyboard or to force a reply from the user.
-     * @return Use this method to send photos.
+     * @return On success, the sent <a href="https://core.telegram.org/bots/api#message">Message</a> is returned.
      * @throws IOException
      * @throws HttpResponseException
      */
     public Message sendPhoto(int chat_id, File photo, Optional<String> caption, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
-        if (photo == null) throw new NullPointerException("Parameter photo cannot be null.");
-        if (!photo.isFile() && photo.exists())
-            throw new IllegalArgumentException("Parameter photo must be an existing file.");
-        return sendPhoto(chat_id, Source.of(photo), caption, reply_to_message_id, reply_markup);
+        if (caption == null) throw new NullPointerException("Parameter caption cannot be null.");
+
+        List<BasicNameValuePair> extraFields = caption
+                .map(cptn -> Arrays.asList(new BasicNameValuePair("caption", cptn)))
+                .orElseGet(() -> Collections.emptyList());
+
+        return sendMedia("sendPhoto", chat_id, photo, reply_to_message_id, reply_markup, extraFields);
     }
 
     /**
@@ -311,12 +316,18 @@ public class TelegramBot {
      * @param reply_to_message_id If the message is a reply, ID of the original message
      * @param reply_markup        Additional interface options. A JSON-serialized object for a custom reply keyboard,
      *                            instructions to hide keyboard or to force a reply from the user.
-     * @return Use this method to send photos.
+     * @return On success, the sent <a href="https://core.telegram.org/bots/api#message">Message</a> is returned.
      * @throws IOException
      * @throws HttpResponseException
      */
     public Message sendPhoto(int chat_id, String photo, Optional<String> caption, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
-        return sendPhoto(chat_id, Source.of(photo), caption, reply_to_message_id, reply_markup);
+        if (caption == null) throw new NullPointerException("Parameter caption cannot be null.");
+
+        List<BasicNameValuePair> extraFields = caption
+                .map(cptn -> Arrays.asList(new BasicNameValuePair("caption", cptn)))
+                .orElseGet(() -> Collections.emptyList());
+
+        return sendMessage("sendPhoto", chat_id, new BasicNameValuePair("photo", photo), reply_to_message_id, reply_markup, extraFields);
     }
 
     /**
@@ -326,7 +337,7 @@ public class TelegramBot {
      * @param photo   Photo to send.
      *                You can either pass a file_id as String to <a href="https://core.telegram.org/bots/api#resending-files-without-reuploading">resend</a> a photo that is already on the Telegram servers,
      *                or upload a new photo using multipart/form-data.
-     * @return Use this method to send photos.
+     * @return On success, the sent <a href="https://core.telegram.org/bots/api#message">Message</a> is returned.
      * @throws IOException
      * @throws HttpResponseException
      */
@@ -341,7 +352,7 @@ public class TelegramBot {
      * @param photo   Photo to send.
      *                You can either pass a file_id as String to <a href="https://core.telegram.org/bots/api#resending-files-without-reuploading">resend</a> a photo that is already on the Telegram servers,
      *                or upload a new photo using multipart/form-data.
-     * @return Use this method to send photos.
+     * @return On success, the sent <a href="https://core.telegram.org/bots/api#message">Message</a> is returned.
      * @throws IOException
      * @throws HttpResponseException
      */
@@ -349,29 +360,135 @@ public class TelegramBot {
         return sendPhoto(chat_id, photo, Optional.empty(), Optional.empty(), Optional.empty());
     }
 
-    private Message sendPhoto(int chat_id, Source photo, Optional<String> caption, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
-        if (photo == null || caption == null || reply_to_message_id == null || reply_markup == null)
-            throw new NullPointerException("Parameters can't be null.");
+    /**
+     * Use this method to send general files.
+     *
+     * @param chat_id             Unique identifier for the message recipient — User or GroupChat id
+     * @param document            File to send.
+     *                            You can either pass a file_id as String to <a href="https://core.telegram.org/bots/api#resending-files-without-reuploading">resend</a> a photo that is already on the Telegram servers,
+     *                            or upload a new file using multipart/form-data.
+     * @param reply_to_message_id
+     * @param reply_markup        Additional interface options. A JSON-serialized object for a custom reply keyboard,
+     *                            instructions to hide keyboard or to force a reply from the user.
+     * @return On success, the sent <a href="https://core.telegram.org/bots/api#message">Message</a> is returned.
+     * @throws IOException
+     * @implNote Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+     */
+    public Message sendDocument(int chat_id, String document, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
+        return sendMessage("sendDocument", chat_id, new BasicNameValuePair("document", document), reply_to_message_id, reply_markup);
+    }
+
+    /**
+     * Use this method to send general files.
+     *
+     * @param chat_id  Unique identifier for the message recipient — User or GroupChat id
+     * @param document File to send.
+     *                 You can either pass a file_id as String to <a href="https://core.telegram.org/bots/api#resending-files-without-reuploading">resend</a> a photo that is already on the Telegram servers,
+     *                 or upload a new file using multipart/form-data.
+     * @return On success, the sent <a href="https://core.telegram.org/bots/api#message">Message</a> is returned.
+     * @throws IOException
+     * @implNote Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+     */
+    public Message sendDocument(int chat_id, String document) throws IOException {
+        return sendMessage("sendDocument", chat_id, new BasicNameValuePair("document", document), Optional.empty(), Optional.empty());
+    }
+
+    /**
+     * Use this method to send general files.
+     *
+     * @param chat_id             Unique identifier for the message recipient — User or GroupChat id
+     * @param document            File to send.
+     *                            You can either pass a file_id as String to <a href="https://core.telegram.org/bots/api#resending-files-without-reuploading">resend</a> a photo that is already on the Telegram servers,
+     *                            or upload a new file using multipart/form-data.
+     * @param reply_to_message_id
+     * @param reply_markup        Additional interface options. A JSON-serialized object for a custom reply keyboard,
+     *                            instructions to hide keyboard or to force a reply from the user.
+     * @return On success, the sent <a href="https://core.telegram.org/bots/api#message">Message</a> is returned.
+     * @throws IOException
+     * @implNote Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+     */
+    public Message sendDocument(int chat_id, File document, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
+        return sendMedia("sendDocument", chat_id, document, reply_to_message_id, reply_markup);
+    }
+
+    /**
+     * Use this method to send general files.
+     *
+     * @param chat_id  Unique identifier for the message recipient — User or GroupChat id
+     * @param document File to send.
+     *                 You can either pass a file_id as String to <a href="https://core.telegram.org/bots/api#resending-files-without-reuploading">resend</a> a photo that is already on the Telegram servers,
+     *                 or upload a new file using multipart/form-data.
+     * @return On success, the sent <a href="https://core.telegram.org/bots/api#message">Message</a> is returned.
+     * @throws IOException
+     * @implNote Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+     */
+    public Message sendDocument(int chat_id, File document) throws IOException {
+        return sendMedia("sendDocument", chat_id, document, Optional.empty(), Optional.empty());
+    }
+
+    private Message sendMedia(String method, int chat_id, File media, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
+        return sendMedia(method, chat_id, media, reply_to_message_id, reply_markup, Collections.emptyList());
+    }
+
+    private Message sendMedia(String method, int chat_id, File media, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup, List<BasicNameValuePair> extraFields) throws IOException {
+
+        String mediaFieldName = method.toLowerCase().replace("send", "");
+
         if (chat_id == 0) throw new IllegalArgumentException("Parameter chat_id can't be zero.");
+        if (media == null || reply_to_message_id == null || reply_markup == null)
+            throw new NullPointerException("Parameters of method " + method + " cannot be null.");
+        if (!media.isFile() && media.exists())
+            throw new IllegalArgumentException("Parameter " + mediaFieldName + " must be an existing file.");
 
-        MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create()
+        MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create()
                 .setMode(HttpMultipartMode.BROWSER_COMPATIBLE)
-                .addTextBody("chat_id", String.valueOf(chat_id));
+                .addTextBody("chat_id", String.valueOf(chat_id))
+                .addPart(mediaFieldName, new FileBody(media));
 
-        photo.setField(multipartEntityBuilder, "photo");
-
-        caption.ifPresent(capt -> multipartEntityBuilder.addTextBody("caption", capt));
-        reply_to_message_id.ifPresent(id -> multipartEntityBuilder.addTextBody("reply_to_message_id", id.toString()));
+        reply_to_message_id.ifPresent(id -> entityBuilder.addTextBody("reply_to_message_id", id.toString()));
         reply_markup.ifPresent(reply -> {
             try {
-                multipartEntityBuilder.addTextBody("reply_markup", mapper.writeValueAsString(reply));
+                entityBuilder.addTextBody("reply_markup", mapper.writeValueAsString(reply));
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
         });
 
-        return Request.Post(ApiUri.resolve("sendPhoto"))
-                .body(multipartEntityBuilder.build())
+        extraFields.stream().forEach(field -> entityBuilder.addTextBody(field.getName(), field.getValue()));
+
+        return Request.Post(ApiUri.resolve(method))
+                .body(entityBuilder.build())
+                .execute()
+                .handleResponse(getResponseHandler(new TypeReference<Response<Message>>() {
+                }));
+    }
+
+    private Message sendMessage(String method, int chat_id, NameValuePair source, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
+        return sendMessage(method, chat_id, source, reply_to_message_id, reply_markup, Collections.emptyList());
+    }
+
+    private Message sendMessage(String method, int chat_id, NameValuePair source, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup, List<BasicNameValuePair> extraFields) throws IOException {
+        if (chat_id == 0) throw new IllegalArgumentException("Parameter chat_id can't be zero.");
+        if (source == null || reply_to_message_id == null || reply_markup == null)
+            throw new NullPointerException("Parameters of method " + method + " cannot be null.");
+
+        Form form = Form.form()
+                .add("chat_id", String.valueOf(chat_id))
+                .add(source.getName(), source.getValue());
+
+        reply_to_message_id.ifPresent(id -> form.add("reply_to_message_id", id.toString()));
+        reply_markup.ifPresent(reply -> {
+            try {
+                form.add("reply_markup", mapper.writeValueAsString(reply));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        extraFields.stream().forEach(field -> form.add(field.getName(), field.getValue()));
+
+        return Request.Post(ApiUri.resolve(method))
+                .bodyForm(form.build())
                 .execute()
                 .handleResponse(getResponseHandler(new TypeReference<Response<Message>>() {
                 }));
