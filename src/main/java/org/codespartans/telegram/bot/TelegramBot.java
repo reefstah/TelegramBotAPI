@@ -561,6 +561,23 @@ public class TelegramBot {
         return sendMessage("sendSticker", chat_id, new BasicNameValuePair("sticker", sticker));
     }
 
+    /**
+     * Use this method to send point on the map.
+     *
+     * @param chat_id             Unique identifier for the message recipient — User or GroupChat id
+     * @param latitude            Latitude of location
+     * @param longitude           Longitude of location
+     * @param reply_to_message_id If the message is a reply, ID of the original message
+     * @param reply_markup        Additional interface options. A JSON-serialized object for a <a href="https://core.telegram.org/bots#keyboards">custom reply keyboard</a>,
+     *                            instructions to hide keyboard or to force a reply from the user.
+     * @return On success, the sent <a href="https://core.telegram.org/bots/api#message">Message</a> is returned.
+     * @throws IOException
+     */
+    public Message sendLocation(int chat_id, float latitude, float longitude, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
+        if (latitude == 0 || longitude == 0) throw new NullPointerException("Latitude or longitude cannot be zero.");
+        return sendMessage("sendLocation", chat_id, new BasicNameValuePair("latitude", String.valueOf(latitude)), reply_to_message_id, reply_markup, Arrays.asList(new BasicNameValuePair("longitude", String.valueOf(longitude))));
+    }
+
     private Message sendMedia(String method, int chat_id, File media) throws IOException {
         return sendMedia(method, chat_id, media, Optional.empty(), Optional.empty(), Collections.emptyList());
     }

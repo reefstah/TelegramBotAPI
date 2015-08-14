@@ -89,4 +89,10 @@ public class TelegramBotIntegrationTest {
         Assert.assertNotNull(message);
     }
 
+    @Test
+    public void sendLocation() throws IOException {
+        TelegramBot bot = TelegramBot.getInstance(token);
+        Message message = bot.sendLocation(groupChatId, 52.3747157F, 4.8986142F, Optional.empty(), Optional.empty());
+    }
+
 }
