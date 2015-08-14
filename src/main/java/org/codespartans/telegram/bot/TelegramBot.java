@@ -14,7 +14,6 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.FileBody;
 import org.codespartans.telegram.bot.models.*;
 
 import java.io.File;
@@ -162,11 +161,11 @@ public class TelegramBot {
      * 1. This method will not work if an outgoing webhook is set up.
      * 2. In order to avoid getting duplicate updates, recalculate offset after each server response.
      *
-     * @param offset  Identifier of the first update to be returned.
-     *                Must be greater by one than the highest among the identifiers of previously received updates.
-     *                By default, updates starting with the earliest unconfirmed update are returned.
-     *                An update is considered confirmed as soon as <a href="https://core.telegram.org/bots/api#getupdates">getUpdates</a> is called with an offset higher than its update_id.
-     * @param limit   Limits the number of updates to be retrieved. Values between 1—100 are accepted. Defaults to 100
+     * @param offset Identifier of the first update to be returned.
+     *               Must be greater by one than the highest among the identifiers of previously received updates.
+     *               By default, updates starting with the earliest unconfirmed update are returned.
+     *               An update is considered confirmed as soon as <a href="https://core.telegram.org/bots/api#getupdates">getUpdates</a> is called with an offset higher than its update_id.
+     * @param limit  Limits the number of updates to be retrieved. Values between 1—100 are accepted. Defaults to 100
      * @return An Array of <a href="https://core.telegram.org/bots/api#update">Update</a> objects is returned.
      * @throws IOException
      * @throws HttpResponseException
@@ -295,17 +294,71 @@ public class TelegramBot {
      * @throws HttpResponseException
      */
     public Message sendPhoto(int chat_id, File photo, Optional<String> caption, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
+        if (photo == null) throw new NullPointerException("Parameter photo cannot be null.");
+        if (!photo.isFile() && photo.exists())
+            throw new IllegalArgumentException("Parameter photo must be an existing file.");
+        return sendPhoto(chat_id, Source.of(photo), caption, reply_to_message_id, reply_markup);
+    }
 
+    /**
+     * Use this method to send photos.
+     *
+     * @param chat_id             Unique identifier for the message recipient — User or GroupChat id
+     * @param photo               Photo to send.
+     *                            You can either pass a file_id as String to <a href="https://core.telegram.org/bots/api#resending-files-without-reuploading">resend</a> a photo that is already on the Telegram servers,
+     *                            or upload a new photo using multipart/form-data.
+     * @param caption             Photo caption (may also be used when resending photos by file_id).
+     * @param reply_to_message_id If the message is a reply, ID of the original message
+     * @param reply_markup        Additional interface options. A JSON-serialized object for a custom reply keyboard,
+     *                            instructions to hide keyboard or to force a reply from the user.
+     * @return Use this method to send photos.
+     * @throws IOException
+     * @throws HttpResponseException
+     */
+    public Message sendPhoto(int chat_id, String photo, Optional<String> caption, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
+        return sendPhoto(chat_id, Source.of(photo), caption, reply_to_message_id, reply_markup);
+    }
+
+    /**
+     * Use this method to send photos.
+     *
+     * @param chat_id Unique identifier for the message recipient — User or GroupChat id
+     * @param photo   Photo to send.
+     *                You can either pass a file_id as String to <a href="https://core.telegram.org/bots/api#resending-files-without-reuploading">resend</a> a photo that is already on the Telegram servers,
+     *                or upload a new photo using multipart/form-data.
+     * @return Use this method to send photos.
+     * @throws IOException
+     * @throws HttpResponseException
+     */
+    public Message sendPhoto(int chat_id, File photo) throws IOException {
+        return sendPhoto(chat_id, photo, Optional.empty(), Optional.empty(), Optional.empty());
+    }
+
+    /**
+     * Use this method to send photos.
+     *
+     * @param chat_id Unique identifier for the message recipient — User or GroupChat id
+     * @param photo   Photo to send.
+     *                You can either pass a file_id as String to <a href="https://core.telegram.org/bots/api#resending-files-without-reuploading">resend</a> a photo that is already on the Telegram servers,
+     *                or upload a new photo using multipart/form-data.
+     * @return Use this method to send photos.
+     * @throws IOException
+     * @throws HttpResponseException
+     */
+    public Message sendPhoto(int chat_id, String photo) throws IOException {
+        return sendPhoto(chat_id, photo, Optional.empty(), Optional.empty(), Optional.empty());
+    }
+
+    private Message sendPhoto(int chat_id, Source photo, Optional<String> caption, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
         if (photo == null || caption == null || reply_to_message_id == null || reply_markup == null)
             throw new NullPointerException("Parameters can't be null.");
         if (chat_id == 0) throw new IllegalArgumentException("Parameter chat_id can't be zero.");
-        if (!photo.isFile() && photo.exists())
-            throw new IllegalArgumentException("Parameter photo must be an existing file.");
 
         MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create()
                 .setMode(HttpMultipartMode.BROWSER_COMPATIBLE)
-                .addTextBody("chat_id", String.valueOf(chat_id))
-                .addPart("photo", new FileBody(photo));
+                .addTextBody("chat_id", String.valueOf(chat_id));
+
+        photo.setField(multipartEntityBuilder, "photo");
 
         caption.ifPresent(capt -> multipartEntityBuilder.addTextBody("caption", capt));
         reply_to_message_id.ifPresent(id -> multipartEntityBuilder.addTextBody("reply_to_message_id", id.toString()));
@@ -322,21 +375,6 @@ public class TelegramBot {
                 .execute()
                 .handleResponse(getResponseHandler(new TypeReference<Response<Message>>() {
                 }));
-    }
-
-    /**
-     * Use this method to send photos.
-     *
-     * @param chat_id Unique identifier for the message recipient — User or GroupChat id
-     * @param photo   Photo to send.
-     *                You can either pass a file_id as String to <a href="https://core.telegram.org/bots/api#resending-files-without-reuploading">resend</a> a photo that is already on the Telegram servers,
-     *                or upload a new photo using multipart/form-data.
-     * @return Use this method to send photos.
-     * @throws IOException
-     * @throws HttpResponseException
-     */
-    public Message sendPhoto(int chat_id, File photo) throws IOException {
-        return sendPhoto(chat_id, photo, Optional.empty(), Optional.empty(), Optional.empty());
     }
 
     private List<Update> getUpdates(List<NameValuePair> nvps) throws IOException {
