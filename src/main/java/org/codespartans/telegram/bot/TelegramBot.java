@@ -289,7 +289,7 @@ public class TelegramBot {
      *                            or upload a new photo using multipart/form-data.
      * @param caption             Photo caption (may also be used when resending photos by file_id).
      * @param reply_to_message_id If the message is a reply, ID of the original message
-     * @param reply_markup        Additional interface options. A JSON-serialized object for a custom reply keyboard,
+     * @param reply_markup        Additional interface options. A JSON-serialized object for a <a href="https://core.telegram.org/bots#keyboards">custom reply keyboard</a>,
      *                            instructions to hide keyboard or to force a reply from the user.
      * @return On success, the sent <a href="https://core.telegram.org/bots/api#message">Message</a> is returned.
      * @throws IOException
@@ -314,7 +314,7 @@ public class TelegramBot {
      *                            or upload a new photo using multipart/form-data.
      * @param caption             Photo caption (may also be used when resending photos by file_id).
      * @param reply_to_message_id If the message is a reply, ID of the original message
-     * @param reply_markup        Additional interface options. A JSON-serialized object for a custom reply keyboard,
+     * @param reply_markup        Additional interface options. A JSON-serialized object for a <a href="https://core.telegram.org/bots#keyboards">custom reply keyboard</a>,
      *                            instructions to hide keyboard or to force a reply from the user.
      * @return On success, the sent <a href="https://core.telegram.org/bots/api#message">Message</a> is returned.
      * @throws IOException
@@ -361,21 +361,90 @@ public class TelegramBot {
     }
 
     /**
+     * Use this method to send audio files,if you want Telegram clients to display the file as a playable voice message.
+     * For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document).
+     *
+     * @param chat_id             Unique identifier for the message recipient — User or GroupChat id
+     * @param audio               Audio file to send.
+     *                            You can either pass a file_id as String to <a href="https://core.telegram.org/bots/api#resending-files-without-reuploading">resend</a> a photo that is already on the Telegram servers,
+     *                            or upload a new audio file using multipart/form-data.
+     * @param duration            Duration of sent audio in seconds
+     * @param reply_to_message_id If the message is a reply, ID of the original message
+     * @param reply_markup        Additional interface options. A JSON-serialized object for a <a href="https://core.telegram.org/bots#keyboards">custom reply keyboard</a>,
+     *                            instructions to hide keyboard or to force a reply from the user.
+     * @return On success, the sent <a href="https://core.telegram.org/bots/api#message">Message</a> is returned.
+     * @throws IOException
+     * @implNote Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+     */
+    public Message sendAudio(int chat_id, String audio, Optional<String> duration, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
+        if (duration == null) throw new NullPointerException("Parameter duration cannot be null.");
+
+        List<BasicNameValuePair> extraFields = duration
+                .map(drtn -> Arrays.asList(new BasicNameValuePair("duration", drtn)))
+                .orElseGet(() -> Collections.emptyList());
+
+        return sendMessage("sendAudio", chat_id, new BasicNameValuePair("audio", audio), reply_to_message_id, reply_markup, extraFields);
+    }
+
+    /**
+     * Use this method to send audio files,if you want Telegram clients to display the file as a playable voice message.
+     * For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document).
+     *
+     * @param chat_id Unique identifier for the message recipient — User or GroupChat id
+     * @param audio   Audio file to send.
+     *                You can either pass a file_id as String to <a href="https://core.telegram.org/bots/api#resending-files-without-reuploading">resend</a> a photo that is already on the Telegram servers,
+     *                or upload a new audio file using multipart/form-data.
+     * @return On success, the sent <a href="https://core.telegram.org/bots/api#message">Message</a> is returned.
+     * @throws IOException
+     * @implNote Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+     */
+    public Message sendAudio(int chat_id, String audio) throws IOException {
+        return sendMessage("sendAudio", chat_id, new BasicNameValuePair("audio", audio));
+    }
+
+    /**
+     * Use this method to send audio files,if you want Telegram clients to display the file as a playable voice message.
+     * For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as Document).
+     *
+     * @param chat_id             Unique identifier for the message recipient — User or GroupChat id
+     * @param audio               Audio file to send.
+     *                            You can either pass a file_id as String to <a href="https://core.telegram.org/bots/api#resending-files-without-reuploading">resend</a> a photo that is already on the Telegram servers,
+     *                            or upload a new audio file using multipart/form-data.
+     * @param duration            Duration of sent audio in seconds
+     * @param reply_to_message_id If the message is a reply, ID of the original message
+     * @param reply_markup        Additional interface options. A JSON-serialized object for a <a href="https://core.telegram.org/bots#keyboards">custom reply keyboard</a>,
+     *                            instructions to hide keyboard or to force a reply from the user.
+     * @return On success, the sent <a href="https://core.telegram.org/bots/api#message">Message</a> is returned.
+     * @throws IOException
+     * @implNote Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+     */
+    public Message sendAudio(int chat_id, File audio, Optional<String> duration, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
+        if (duration == null) throw new NullPointerException("Parameter duration cannot be null.");
+
+        List<BasicNameValuePair> extraFields = duration
+                .map(drtn -> Arrays.asList(new BasicNameValuePair("duration", drtn)))
+                .orElseGet(() -> Collections.emptyList());
+
+        return sendMedia("sendAudio", chat_id, audio, reply_to_message_id, reply_markup, extraFields);
+    }
+
+
+    /**
      * Use this method to send general files.
      *
      * @param chat_id             Unique identifier for the message recipient — User or GroupChat id
      * @param document            File to send.
      *                            You can either pass a file_id as String to <a href="https://core.telegram.org/bots/api#resending-files-without-reuploading">resend</a> a photo that is already on the Telegram servers,
      *                            or upload a new file using multipart/form-data.
-     * @param reply_to_message_id
-     * @param reply_markup        Additional interface options. A JSON-serialized object for a custom reply keyboard,
+     * @param reply_to_message_id If the message is a reply, ID of the original message
+     * @param reply_markup        Additional interface options. A JSON-serialized object for a <a href="https://core.telegram.org/bots#keyboards">custom reply keyboard</a>,
      *                            instructions to hide keyboard or to force a reply from the user.
      * @return On success, the sent <a href="https://core.telegram.org/bots/api#message">Message</a> is returned.
      * @throws IOException
      * @implNote Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
      */
     public Message sendDocument(int chat_id, String document, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
-        return sendMessage("sendDocument", chat_id, new BasicNameValuePair("document", document), reply_to_message_id, reply_markup);
+        return sendMessage("sendDocument", chat_id, new BasicNameValuePair("document", document), reply_to_message_id, reply_markup, Collections.emptyList());
     }
 
     /**
@@ -390,7 +459,7 @@ public class TelegramBot {
      * @implNote Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
      */
     public Message sendDocument(int chat_id, String document) throws IOException {
-        return sendMessage("sendDocument", chat_id, new BasicNameValuePair("document", document), Optional.empty(), Optional.empty());
+        return sendMessage("sendDocument", chat_id, new BasicNameValuePair("document", document));
     }
 
     /**
@@ -400,15 +469,15 @@ public class TelegramBot {
      * @param document            File to send.
      *                            You can either pass a file_id as String to <a href="https://core.telegram.org/bots/api#resending-files-without-reuploading">resend</a> a photo that is already on the Telegram servers,
      *                            or upload a new file using multipart/form-data.
-     * @param reply_to_message_id
-     * @param reply_markup        Additional interface options. A JSON-serialized object for a custom reply keyboard,
+     * @param reply_to_message_id If the message is a reply, ID of the original message
+     * @param reply_markup        Additional interface options. A JSON-serialized object for a <a href="https://core.telegram.org/bots#keyboards">custom reply keyboard</a>,
      *                            instructions to hide keyboard or to force a reply from the user.
      * @return On success, the sent <a href="https://core.telegram.org/bots/api#message">Message</a> is returned.
      * @throws IOException
      * @implNote Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
      */
     public Message sendDocument(int chat_id, File document, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
-        return sendMedia("sendDocument", chat_id, document, reply_to_message_id, reply_markup);
+        return sendMedia("sendDocument", chat_id, document, reply_to_message_id, reply_markup, Collections.emptyList());
     }
 
     /**
@@ -423,11 +492,11 @@ public class TelegramBot {
      * @implNote Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
      */
     public Message sendDocument(int chat_id, File document) throws IOException {
-        return sendMedia("sendDocument", chat_id, document, Optional.empty(), Optional.empty());
+        return sendMedia("sendDocument", chat_id, document);
     }
 
-    private Message sendMedia(String method, int chat_id, File media, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
-        return sendMedia(method, chat_id, media, reply_to_message_id, reply_markup, Collections.emptyList());
+    private Message sendMedia(String method, int chat_id, File media) throws IOException {
+        return sendMedia(method, chat_id, media, Optional.empty(), Optional.empty(), Collections.emptyList());
     }
 
     private Message sendMedia(String method, int chat_id, File media, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup, List<BasicNameValuePair> extraFields) throws IOException {
@@ -463,8 +532,8 @@ public class TelegramBot {
                 }));
     }
 
-    private Message sendMessage(String method, int chat_id, NameValuePair source, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
-        return sendMessage(method, chat_id, source, reply_to_message_id, reply_markup, Collections.emptyList());
+    private Message sendMessage(String method, int chat_id, NameValuePair source) throws IOException {
+        return sendMessage(method, chat_id, source, Optional.empty(), Optional.empty(), Collections.emptyList());
     }
 
     private Message sendMessage(String method, int chat_id, NameValuePair source, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup, List<BasicNameValuePair> extraFields) throws IOException {
