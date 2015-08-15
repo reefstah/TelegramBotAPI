@@ -592,6 +592,53 @@ public class TelegramBot {
         return sendMessage("sendLocation", chat_id, fields, reply_to_message_id, reply_markup);
     }
 
+    /**
+     * Use this method to send point on the map.
+     *
+     * @param chat_id   Unique identifier for the message recipient — User or GroupChat id
+     * @param latitude  Latitude of location
+     * @param longitude Longitude of location
+     * @return On success, the sent <a href="https://core.telegram.org/bots/api#message">Message</a> is returned.
+     * @throws IOException
+     */
+    public Message sendLocation(int chat_id, float latitude, float longitude) throws IOException {
+        if (latitude == 0 || longitude == 0) throw new NullPointerException("Latitude or longitude cannot be zero.");
+
+        List<BasicNameValuePair> fields = Arrays.asList(
+                new BasicNameValuePair("latitude", String.valueOf(latitude)),
+                new BasicNameValuePair("longitude", String.valueOf(longitude)));
+
+        return sendMessage("sendLocation", chat_id, fields);
+    }
+
+    /**
+     * Use this method when you need to tell the user that something is happening on the bot's side.
+     * The status is set for 5 seconds or less (when a message arrives from your bot, Telegram clients clear its typing status).
+     *
+     * @param chat_id Unique identifier for the message recipient — User or GroupChat id
+     * @param action  Type of action to broadcast.
+     *                Choose one, depending on what the user is about to receive:
+     *                <i>typing</i> for <a href="https://core.telegram.org/bots/api#sendmessage">text messages</a>,
+     *                <i>upload_photo</i> for <a href="https://core.telegram.org/bots/api#sendphoto">photos</a>,
+     *                <i>record_video</i> or <i>upload_video</i> for <a href="https://core.telegram.org/bots/api#sendvideo">videos</a>,
+     *                <i>record_audio</i> or <i>upload_audio</i> for <a href="https://core.telegram.org/bots/api#sendaudio">audio files</a>,
+     *                <i>upload_document</i> for <a href="https://core.telegram.org/bots/api#senddocument">general files</a>,
+     *                <i>find_location</i> for <a href="https://core.telegram.org/bots/api#sendlocation">location data</a>.
+     * @implNote We only recommend using this method when a response from the bot will take a noticeable amount of time to arrive.
+     */
+    public void sendChatAction(int chat_id, Action action) throws IOException {
+        if (chat_id == 0) throw new IllegalArgumentException("Parameter chat_id can't be zero.");
+
+
+        Form form = Form.form()
+                .add("chat_id", String.valueOf(chat_id))
+                .add("action", action.toString().toLowerCase());
+
+        Request.Post(ApiUri.resolve("sendChatAction"))
+                .bodyForm(form.build())
+                .execute();
+    }
+
     private Message sendMedia(String method, int chat_id, File media) throws IOException {
         return sendMedia(method, chat_id, media, Optional.empty(), Optional.empty(), Collections.emptyList());
     }
