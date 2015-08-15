@@ -3,7 +3,7 @@ package org.codespartans.telegram.bot.models;
 import java.util.Optional;
 
 /**
- * Created by ralph on 24/07/15.
+ * This object represents one size of a photo or a <a href="https://core.telegram.org/bots/api#document">file</a> / <a href="https://core.telegram.org/bots/api#sticker">sticker</a> thumbnail.
  */
 public class PhotoSize {
     private String file_id;

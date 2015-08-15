@@ -1,7 +1,7 @@
 package org.codespartans.telegram.bot.models;
 
 /**
- * Created by ralph on 24/07/15.
+ * This object represents a point on the map.
  */
 public class Location {
     private float longitude;

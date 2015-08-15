@@ -3,7 +3,8 @@ package org.codespartans.telegram.bot.models;
 import java.util.Optional;
 
 /**
- * Created by ralph on 24/07/15.
+ * This object represents a general file (as opposed to <a href="https://core.telegram.org/bots/api#photosize">photos</a>
+ * and <a href="https://core.telegram.org/bots/api#audio">audio files</a>).
  */
 public class Document {
     private String file_id;

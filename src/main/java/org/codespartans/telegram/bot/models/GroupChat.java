@@ -1,7 +1,7 @@
 package org.codespartans.telegram.bot.models;
 
 /**
- * Created by ralph on 24/07/15.
+ * This object represents a group chat.
  */
 public class GroupChat implements Chat {
     private int id;

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Created by ralph on 24/07/15.
+ * This object represents a message.
  */
 public class Message {
     private int message_id;
