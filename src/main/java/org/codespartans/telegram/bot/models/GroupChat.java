@@ -11,15 +11,26 @@ public class GroupChat implements Chat {
         return id;
     }
 
-    public void setId(int id) {
+    public GroupChat setId(int id) {
         this.id = id;
+        return this;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
+    public GroupChat setTitle(String title) {
         this.title = title;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("GroupChat{");
+        sb.append("id=").append(id);
+        sb.append(", title='").append(title).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

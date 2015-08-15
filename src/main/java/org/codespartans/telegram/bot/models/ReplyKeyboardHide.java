@@ -17,11 +17,26 @@ public class ReplyKeyboardHide {
         return hide_keyboard;
     }
 
+    public ReplyKeyboardHide setHide_keyboard(boolean hide_keyboard) {
+        this.hide_keyboard = hide_keyboard;
+        return this;
+    }
+
     public Optional<Boolean> getSelective() {
         return selective;
     }
 
-    public void setSelective(Optional<Boolean> selective) {
+    public ReplyKeyboardHide setSelective(Optional<Boolean> selective) {
         this.selective = selective;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("ReplyKeyboardHide{");
+        sb.append("hide_keyboard=").append(hide_keyboard);
+        sb.append(", selective=").append(selective);
+        sb.append('}');
+        return sb.toString();
     }
 }

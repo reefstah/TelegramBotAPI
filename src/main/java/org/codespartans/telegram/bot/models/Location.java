@@ -11,15 +11,26 @@ public class Location {
         return longitude;
     }
 
-    public void setLongitude(float longitude) {
+    public Location setLongitude(float longitude) {
         this.longitude = longitude;
+        return this;
     }
 
     public float getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(float latitude) {
+    public Location setLatitude(float latitude) {
         this.latitude = latitude;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Location{");
+        sb.append("longitude=").append(longitude);
+        sb.append(", latitude=").append(latitude);
+        sb.append('}');
+        return sb.toString();
     }
 }

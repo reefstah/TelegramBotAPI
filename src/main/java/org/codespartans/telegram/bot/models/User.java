@@ -46,4 +46,15 @@ public class User implements Chat {
         this.username = username;
         return this;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("User{");
+        sb.append("id=").append(id);
+        sb.append(", first_name='").append(first_name).append('\'');
+        sb.append(", last_name=").append(last_name);
+        sb.append(", username=").append(username);
+        sb.append('}');
+        return sb.toString();
+    }
 }

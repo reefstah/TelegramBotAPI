@@ -15,11 +15,26 @@ public class ForceReply {
         return force_relpy;
     }
 
+    public ForceReply setForce_relpy(boolean force_relpy) {
+        this.force_relpy = force_relpy;
+        return this;
+    }
+
     public Optional<Boolean> getSelective() {
         return selective;
     }
 
-    public void setSelective(Optional<Boolean> selective) {
+    public ForceReply setSelective(Optional<Boolean> selective) {
         this.selective = selective;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("ForceReply{");
+        sb.append("force_relpy=").append(force_relpy);
+        sb.append(", selective=").append(selective);
+        sb.append('}');
+        return sb.toString();
     }
 }
