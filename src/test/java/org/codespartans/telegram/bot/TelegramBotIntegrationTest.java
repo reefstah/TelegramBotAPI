@@ -75,13 +75,6 @@ public class TelegramBotIntegrationTest {
     }
 
     @Test
-    public void reSendPhoto() throws IOException {
-        TelegramBot bot = TelegramBot.getInstance(token);
-        Message message = bot.sendPhoto(groupChatId, photoId);
-        Assert.assertNotNull(message);
-    }
-
-    @Test
     public void sendDocument() throws IOException {
         TelegramBot bot = TelegramBot.getInstance(token);
         File file = new File(this.getClass().getResource("/5411648.png").getPath());

@@ -119,11 +119,14 @@ public class TelegramBot {
 
         if (chat_id == 0) throw new IllegalArgumentException("Parameter chat_id shouldn't be zero.");
 
-        List<BasicNameValuePair> extraFields = disable_web_page_preview
-                .map(preview -> Arrays.asList(new BasicNameValuePair("disable_web_page_preview", preview.toString())))
+        List<BasicNameValuePair> fields = disable_web_page_preview
+                .map(preview -> Arrays.asList(
+                        new BasicNameValuePair("disable_web_page_preview", preview.toString()),
+                        new BasicNameValuePair("text", text)
+                ))
                 .orElseGet(() -> Collections.emptyList());
 
-        return sendMessage("sendMessage", chat_id, new BasicNameValuePair("text", text), reply_to_message_id, reply_markup, extraFields);
+        return sendMessage("sendMessage", chat_id, fields, reply_to_message_id, reply_markup);
     }
 
     /**
@@ -323,11 +326,14 @@ public class TelegramBot {
     public Message sendPhoto(int chat_id, String photo, Optional<String> caption, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
         if (caption == null) throw new NullPointerException("Parameter caption cannot be null.");
 
-        List<BasicNameValuePair> extraFields = caption
-                .map(cptn -> Arrays.asList(new BasicNameValuePair("caption", cptn)))
+        List<BasicNameValuePair> fields = caption
+                .map(cptn -> Arrays.asList(
+                                new BasicNameValuePair("caption", cptn),
+                                new BasicNameValuePair("photo", photo))
+                )
                 .orElseGet(() -> Collections.emptyList());
 
-        return sendMessage("sendPhoto", chat_id, new BasicNameValuePair("photo", photo), reply_to_message_id, reply_markup, extraFields);
+        return sendMessage("sendPhoto", chat_id, fields, reply_to_message_id, reply_markup);
     }
 
     /**
@@ -379,11 +385,14 @@ public class TelegramBot {
     public Message sendAudio(int chat_id, String audio, Optional<String> duration, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
         if (duration == null) throw new NullPointerException("Parameter duration cannot be null.");
 
-        List<BasicNameValuePair> extraFields = duration
-                .map(drtn -> Arrays.asList(new BasicNameValuePair("duration", drtn)))
+        List<BasicNameValuePair> fields = duration
+                .map(drtn -> Arrays.asList(
+                        new BasicNameValuePair("duration", drtn),
+                        new BasicNameValuePair("audio", audio)
+                ))
                 .orElseGet(() -> Collections.emptyList());
 
-        return sendMessage("sendAudio", chat_id, new BasicNameValuePair("audio", audio), reply_to_message_id, reply_markup, extraFields);
+        return sendMessage("sendAudio", chat_id, fields, reply_to_message_id, reply_markup);
     }
 
     /**
@@ -399,7 +408,7 @@ public class TelegramBot {
      * @implNote Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
      */
     public Message sendAudio(int chat_id, String audio) throws IOException {
-        return sendMessage("sendAudio", chat_id, new BasicNameValuePair("audio", audio));
+        return sendMessage("sendAudio", chat_id, Arrays.asList(new BasicNameValuePair("audio", audio)));
     }
 
     /**
@@ -444,7 +453,7 @@ public class TelegramBot {
      * @implNote Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
      */
     public Message sendDocument(int chat_id, String document, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
-        return sendMessage("sendDocument", chat_id, new BasicNameValuePair("document", document), reply_to_message_id, reply_markup, Collections.emptyList());
+        return sendMessage("sendDocument", chat_id, Arrays.asList(new BasicNameValuePair("document", document)), reply_to_message_id, reply_markup);
     }
 
     /**
@@ -459,7 +468,7 @@ public class TelegramBot {
      * @implNote Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
      */
     public Message sendDocument(int chat_id, String document) throws IOException {
-        return sendMessage("sendDocument", chat_id, new BasicNameValuePair("document", document));
+        return sendMessage("sendDocument", chat_id, Arrays.asList(new BasicNameValuePair("document", document)));
     }
 
     /**
@@ -543,7 +552,7 @@ public class TelegramBot {
      * @implNote Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
      */
     public Message sendSticker(int chat_id, String sticker, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
-        return sendMessage("sendSticker", chat_id, new BasicNameValuePair("sticker", sticker), reply_to_message_id, reply_markup, Collections.emptyList());
+        return sendMessage("sendSticker", chat_id, Arrays.asList(new BasicNameValuePair("sticker", sticker)), reply_to_message_id, reply_markup);
     }
 
     /**
@@ -558,7 +567,7 @@ public class TelegramBot {
      * @implNote Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
      */
     public Message sendSticker(int chat_id, String sticker) throws IOException {
-        return sendMessage("sendSticker", chat_id, new BasicNameValuePair("sticker", sticker));
+        return sendMessage("sendSticker", chat_id, Arrays.asList(new BasicNameValuePair("sticker", sticker)));
     }
 
     /**
@@ -575,7 +584,12 @@ public class TelegramBot {
      */
     public Message sendLocation(int chat_id, float latitude, float longitude, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
         if (latitude == 0 || longitude == 0) throw new NullPointerException("Latitude or longitude cannot be zero.");
-        return sendMessage("sendLocation", chat_id, new BasicNameValuePair("latitude", String.valueOf(latitude)), reply_to_message_id, reply_markup, Arrays.asList(new BasicNameValuePair("longitude", String.valueOf(longitude))));
+
+        List<BasicNameValuePair> fields = Arrays.asList(
+                new BasicNameValuePair("latitude", String.valueOf(latitude)),
+                new BasicNameValuePair("longitude", String.valueOf(longitude)));
+
+        return sendMessage("sendLocation", chat_id, fields, reply_to_message_id, reply_markup);
     }
 
     private Message sendMedia(String method, int chat_id, File media) throws IOException {
@@ -615,18 +629,17 @@ public class TelegramBot {
                 }));
     }
 
-    private Message sendMessage(String method, int chat_id, NameValuePair source) throws IOException {
-        return sendMessage(method, chat_id, source, Optional.empty(), Optional.empty(), Collections.emptyList());
+    private Message sendMessage(String method, int chat_id, List<BasicNameValuePair> fields) throws IOException {
+        return sendMessage(method, chat_id, fields, Optional.empty(), Optional.empty());
     }
 
-    private Message sendMessage(String method, int chat_id, NameValuePair source, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup, List<BasicNameValuePair> extraFields) throws IOException {
+    private Message sendMessage(String method, int chat_id, List<BasicNameValuePair> fields, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
         if (chat_id == 0) throw new IllegalArgumentException("Parameter chat_id can't be zero.");
-        if (source == null || reply_to_message_id == null || reply_markup == null)
+        if (reply_to_message_id == null || reply_markup == null)
             throw new NullPointerException("Parameters of method " + method + " cannot be null.");
 
         Form form = Form.form()
-                .add("chat_id", String.valueOf(chat_id))
-                .add(source.getName(), source.getValue());
+                .add("chat_id", String.valueOf(chat_id));
 
         reply_to_message_id.ifPresent(id -> form.add("reply_to_message_id", id.toString()));
         reply_markup.ifPresent(reply -> {
@@ -637,7 +650,7 @@ public class TelegramBot {
             }
         });
 
-        extraFields.stream().forEach(field -> form.add(field.getName(), field.getValue()));
+        fields.stream().forEach(field -> form.add(field.getName(), field.getValue()));
 
         return Request.Post(ApiUri.resolve(method))
                 .bodyForm(form.build())
