@@ -9,7 +9,7 @@ import java.util.Optional;
  * An exception is made for one-time keyboards that are hidden immediately after the user presses a button
  * (see <a href="https://core.telegram.org/bots/api#replykeyboardmarkup">ReplyKeyboardMarkup</a>).
  */
-public class ReplyKeyboardHide {
+public class ReplyKeyboardHide implements Reply {
     private boolean hide_keyboard = true;
     private Optional<Boolean> selective;
 

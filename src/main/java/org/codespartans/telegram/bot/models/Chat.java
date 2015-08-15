@@ -1,7 +1,8 @@
 package org.codespartans.telegram.bot.models;
 
 /**
- * Created by ralph on 24/07/15.
+ * This object can either be a {@link org.codespartans.telegram.bot.models.User} or a {@link org.codespartans.telegram.bot.models.GroupChat}.
+ * @See org.codespartans.telegram.bot.models.User  org.codespartans.telegram.bot.models.GroupChat
  */
 public interface Chat {
 }

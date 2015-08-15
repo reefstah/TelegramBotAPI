@@ -7,7 +7,7 @@ import java.util.Optional;
  * This object represents a <a href="https://core.telegram.org/bots#keyboards">custom keyboard</a> with reply options
  * (see <a href="https://core.telegram.org/bots#keyboards">Introduction to bots</a> for details and examples).
  */
-public class ReplyKeyboardMarkup {
+public class ReplyKeyboardMarkup implements Reply {
     private List<List<String>> keyboard;
     private Optional<Boolean> resize_keyboard;
     private Optional<Boolean> one_time_keyboard;

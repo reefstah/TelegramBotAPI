@@ -7,7 +7,7 @@ import java.util.Optional;
  * Telegram clients will display a reply interface to the user (act as if the user has selected the bot‘s message and tapped ’Reply').
  * This can be extremely useful if you want to create user-friendly step-by-step interfaces without having to sacrifice <a href="https://core.telegram.org/bots#privacy-mode">privacy mode</a>.
  */
-public class ForceReply {
+public class ForceReply implements Reply {
     private boolean force_relpy = true;
     private Optional<Boolean> selective;
 
