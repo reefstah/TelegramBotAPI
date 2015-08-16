@@ -322,12 +322,8 @@ public class TelegramBot {
     public Message sendPhoto(int chat_id, String photo, Optional<String> caption, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
         if (caption == null) throw new NullPointerException("Parameter caption cannot be null.");
 
-        List<BasicNameValuePair> fields = caption
-                .map(cptn -> Arrays.asList(
-                                new BasicNameValuePair("caption", cptn),
-                                new BasicNameValuePair("photo", photo))
-                )
-                .orElseGet(() -> Collections.emptyList());
+        List<BasicNameValuePair> fields = Arrays.asList(new BasicNameValuePair("photo", photo));
+        caption.map(cptn -> fields.add(new BasicNameValuePair("caption", cptn)));
 
         return sendMessage("sendPhoto", chat_id, fields, reply_to_message_id, reply_markup);
     }
@@ -381,12 +377,8 @@ public class TelegramBot {
     public Message sendAudio(int chat_id, String audio, Optional<String> duration, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
         if (duration == null) throw new NullPointerException("Parameter duration cannot be null.");
 
-        List<BasicNameValuePair> fields = duration
-                .map(drtn -> Arrays.asList(
-                        new BasicNameValuePair("duration", drtn),
-                        new BasicNameValuePair("audio", audio)
-                ))
-                .orElseGet(() -> Collections.emptyList());
+        List<BasicNameValuePair> fields = Arrays.asList(new BasicNameValuePair("audio", audio));
+        duration.map(drtn -> fields.add(new BasicNameValuePair("duration", drtn)));
 
         return sendMessage("sendAudio", chat_id, fields, reply_to_message_id, reply_markup);
     }
