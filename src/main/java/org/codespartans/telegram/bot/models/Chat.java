@@ -5,4 +5,5 @@ package org.codespartans.telegram.bot.models;
  * @See org.codespartans.telegram.bot.models.User  org.codespartans.telegram.bot.models.GroupChat
  */
 public interface Chat {
+    int getId();
 }

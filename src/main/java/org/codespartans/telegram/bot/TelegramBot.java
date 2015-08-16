@@ -119,12 +119,8 @@ public class TelegramBot {
 
         if (chat_id == 0) throw new IllegalArgumentException("Parameter chat_id shouldn't be zero.");
 
-        List<BasicNameValuePair> fields = disable_web_page_preview
-                .map(preview -> Arrays.asList(
-                        new BasicNameValuePair("disable_web_page_preview", preview.toString()),
-                        new BasicNameValuePair("text", text)
-                ))
-                .orElseGet(() -> Collections.emptyList());
+        List<BasicNameValuePair> fields = Arrays.asList(new BasicNameValuePair("text", text));
+        disable_web_page_preview.map(preview -> fields.add(new BasicNameValuePair("disable_web_page_preview", preview.toString())));
 
         return sendMessage("sendMessage", chat_id, fields, reply_to_message_id, reply_markup);
     }
