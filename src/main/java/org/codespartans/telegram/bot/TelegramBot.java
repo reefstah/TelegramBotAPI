@@ -1,9 +1,15 @@
 package org.codespartans.telegram.bot;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
@@ -12,20 +18,19 @@ import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.fluent.Form;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.message.BasicNameValuePair;
-import org.codespartans.telegram.bot.models.*;
+import org.codespartans.telegram.bot.models.Action;
+import org.codespartans.telegram.bot.models.Message;
+import org.codespartans.telegram.bot.models.Reply;
+import org.codespartans.telegram.bot.models.Response;
+import org.codespartans.telegram.bot.models.Update;
+import org.codespartans.telegram.bot.models.User;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 /**
  * Implementation of Telegrams bot API.
@@ -44,6 +49,7 @@ public class TelegramBot {
                 .setScheme(SCHEME)
                 .setHost(HOST)
                 .setPath(String.format("/bot%s/", token))
+                .setCharset(StandardCharsets.UTF_8)
                 .build();
     }
 
@@ -248,7 +254,7 @@ public class TelegramBot {
                 .returnResponse()
                 .getStatusLine();
 
-        if (!(statusLine.getStatusCode() == 200))
+        if (statusLine.getStatusCode() != 200)
             throw new HttpResponseException(statusLine.hashCode(), statusLine.getReasonPhrase());
     }
 
@@ -641,10 +647,12 @@ public class TelegramBot {
         if (!media.isFile() && media.exists())
             throw new IllegalArgumentException("Parameter " + mediaFieldName + " must be an existing file.");
 
-        MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create()
-                .setMode(HttpMultipartMode.BROWSER_COMPATIBLE)
-                .addTextBody("chat_id", String.valueOf(chat_id))
-                .addPart(mediaFieldName, new FileBody(media));
+		final MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create()
+				.setLaxMode()
+				.setContentType(TelegramContentType.MULTIPART_FORM_DATA)
+				.setCharset(StandardCharsets.UTF_8)
+				.addTextBody("chat_id", String.valueOf(chat_id), TelegramContentType.PAIN_TEXT)
+				.addBinaryBody(mediaFieldName, media, TelegramContentType.MULTIPART_FORM_DATA, media.getName());
 
         reply_to_message_id.ifPresent(id -> entityBuilder.addTextBody("reply_to_message_id", id.toString()));
         reply_markup.ifPresent(reply -> {
