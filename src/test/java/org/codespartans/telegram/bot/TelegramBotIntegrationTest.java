@@ -26,7 +26,8 @@ public class TelegramBotIntegrationTest {
 
     private static final String token = System.getenv("token");
     private static final int groupChatId = Integer.valueOf(System.getenv("groupChatId"));
-    private static final String photoId = System.getenv("photoId");
+    @SuppressWarnings("unused")
+	private static final String photoId = System.getenv("photoId");
 
     @Test(expected = NullPointerException.class)
     public void getInstanceWithNullToken() {
