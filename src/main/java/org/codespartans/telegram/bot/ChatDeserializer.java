@@ -16,15 +16,11 @@ import java.io.IOException;
  */
 public class ChatDeserializer extends JsonDeserializer<Chat> {
 
-    @Override
-    public Chat deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
-
-        TreeNode tree = jsonParser.getCodec().readTree(jsonParser);
-
-
-
-        jsonParser.nextFieldName();
-        String fieldName = jsonParser.nextFieldName();
-        return tree.get("first_name") != null ? jsonParser.getCodec().treeToValue(tree, User.class) : jsonParser.getCodec().treeToValue(tree, GroupChat.class);
-    }
+	@Override
+	public Chat deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+		TreeNode tree = jsonParser.getCodec().readTree(jsonParser);
+		jsonParser.nextFieldName();
+		jsonParser.nextFieldName();
+		return tree.get("first_name") != null ? jsonParser.getCodec().treeToValue(tree, User.class) : jsonParser.getCodec().treeToValue(tree, GroupChat.class);
+	}
 }
