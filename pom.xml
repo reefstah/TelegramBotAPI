@@ -91,7 +91,11 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <groups>org.codespartans.telegram.bot.TelegramBotIntegrationTest</groups>
+                    <groups>org.codespartans.telegram.bot.IntegrationTests</groups>
+                    <environmentVariables>
+                        <token>${env.TOKEN}</token>
+                        <groupChatId>${env.GROUPCHATID}</groupChatId>
+                    </environmentVariables>
                 </configuration>
             </plugin>
         </plugins>

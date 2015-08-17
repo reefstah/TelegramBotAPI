@@ -18,16 +18,14 @@ import java.util.Optional;
  * Created by ralph on 08/07/15.
  */
 
-interface IntegrationTest {
+interface IntegrationTests { /* category marker */
 }
 
-@Category(IntegrationTest.class)
+@Category(IntegrationTests.class)
 public class TelegramBotIntegrationTest {
 
     private static final String token = System.getenv("token");
     private static final int groupChatId = Integer.valueOf(System.getenv("groupChatId"));
-    @SuppressWarnings("unused")
-	private static final String photoId = System.getenv("photoId");
 
     @Test(expected = NullPointerException.class)
     public void getInstanceWithNullToken() {
