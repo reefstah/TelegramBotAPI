@@ -1,16 +1,9 @@
 package org.codespartans.telegram.bot;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
@@ -20,17 +13,14 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.message.BasicNameValuePair;
-import org.codespartans.telegram.bot.models.Action;
-import org.codespartans.telegram.bot.models.Message;
-import org.codespartans.telegram.bot.models.Reply;
-import org.codespartans.telegram.bot.models.Response;
-import org.codespartans.telegram.bot.models.Update;
-import org.codespartans.telegram.bot.models.User;
+import org.codespartans.telegram.bot.models.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 /**
  * Implementation of Telegrams bot API.
@@ -272,8 +262,9 @@ public class TelegramBot {
 		return Request.Post(ApiUri.resolve("forwardMessage"))
 				.bodyForm(params)
 				.execute()
-				.handleResponse(getResponseHandler(new TypeReference<Response<Message>>(){}));
-	}
+                .handleResponse(getResponseHandler(new TypeReference<Response<Message>>() {
+                }));
+    }
 
 	/**
 	 * Use this method to send photos.
@@ -575,7 +566,7 @@ public class TelegramBot {
 	 */
 	public Message sendLocation(int chat_id, float latitude, float longitude, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
 		if (latitude == 0 || longitude == 0)
-			throw new NullPointerException("Latitude or longitude cannot be zero.");
+            throw new IllegalArgumentException("Latitude or longitude cannot be zero.");
 
 		final List<BasicNameValuePair> fields = Arrays.asList(
 				new BasicNameValuePair("latitude", String.valueOf(latitude)),
@@ -595,7 +586,7 @@ public class TelegramBot {
 	 */
 	public Message sendLocation(int chat_id, float latitude, float longitude) throws IOException {
 		if (latitude == 0 || longitude == 0)
-			throw new NullPointerException("Latitude or longitude cannot be zero.");
+            throw new IllegalArgumentException("Latitude or longitude cannot be zero.");
 
 		final List<BasicNameValuePair> fields = Arrays.asList(
 				new BasicNameValuePair("latitude", String.valueOf(latitude)),
@@ -665,8 +656,9 @@ public class TelegramBot {
 		return Request.Post(ApiUri.resolve(method))
 				.body(entityBuilder.build())
 				.execute()
-				.handleResponse(getResponseHandler(new TypeReference<Response<Message>>(){}));
-	}
+                .handleResponse(getResponseHandler(new TypeReference<Response<Message>>() {
+                }));
+    }
 
 	private Message sendMessage(String method, int chat_id, List<BasicNameValuePair> fields) throws IOException {
 		return sendMessage(method, chat_id, fields, Optional.empty(), Optional.empty());
@@ -680,23 +672,23 @@ public class TelegramBot {
 
 		final List<NameValuePair> params = new ArrayList<>(3 + fields.size());
 		params.add(new BasicNameValuePair("chat_id", String.valueOf(chat_id)));
+        params.addAll(fields);
 
-		reply_to_message_id.ifPresent(id -> new BasicNameValuePair("reply_to_message_id", id.toString()));
-		reply_markup.ifPresent(reply -> {
-			try {
-				new BasicNameValuePair("reply_markup", mapper.writeValueAsString(reply));
-			} catch (JsonProcessingException e) {
-				throw new RuntimeException(e);
-			}
-		});
-
-		fields.stream().forEach(field -> new BasicNameValuePair(field.getName(), field.getValue()));
+        reply_to_message_id.ifPresent(id -> params.add(new BasicNameValuePair("reply_to_message_id", id.toString())));
+        reply_markup.ifPresent(reply -> {
+            try {
+                params.add(new BasicNameValuePair("reply_markup", mapper.writeValueAsString(reply)));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
 		return Request.Post(ApiUri.resolve(method))
 				.bodyForm(params)
 				.execute()
-				.handleResponse(getResponseHandler(new TypeReference<Response<Message>>(){}));
-	}
+                .handleResponse(getResponseHandler(new TypeReference<Response<Message>>() {
+                }));
+    }
 
 	private List<Update> getUpdates(List<NameValuePair> nvps) throws IOException {
 		final URI uri;
@@ -709,8 +701,9 @@ public class TelegramBot {
 
 		return Request.Get(uri)
 				.execute()
-				.handleResponse(getResponseHandler(new TypeReference<Response<List<Update>>>(){}));
-	}
+                .handleResponse(getResponseHandler(new TypeReference<Response<List<Update>>>() {
+                }));
+    }
 
 	private <T> ResponseHandler<T> getResponseHandler(TypeReference<Response<T>> reference) {
 		return (HttpResponse response) -> {

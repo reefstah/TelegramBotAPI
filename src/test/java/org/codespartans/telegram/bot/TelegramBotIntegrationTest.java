@@ -1,6 +1,5 @@
 package org.codespartans.telegram.bot;
 
-import org.codespartans.telegram.bot.models.Action;
 import org.codespartans.telegram.bot.models.Message;
 import org.codespartans.telegram.bot.models.Update;
 import org.codespartans.telegram.bot.models.User;
@@ -85,14 +84,14 @@ public class TelegramBotIntegrationTest {
     @Test
     public void sendLocation() throws IOException {
         TelegramBot bot = TelegramBot.getInstance(token);
-        Message message = bot.sendLocation(groupChatId, 52.3747157F, 4.8986142F, Optional.empty(), Optional.empty());
+        Message message = bot.sendLocation(groupChatId, 52.3747157F, 4.8986142F);
         Assert.assertNotNull(message);
     }
 
     @Test
-    public void sendChatAction() throws IOException {
+    public void sendMessage() throws IOException {
         TelegramBot bot = TelegramBot.getInstance(token);
-        bot.sendChatAction(groupChatId, Action.UPLOAD_PHOTO);
-        System.out.println();
+        Message message = bot.sendMessage(groupChatId, "Hello, this a integration test message.");
+        Assert.assertNotNull(message);
     }
 }
