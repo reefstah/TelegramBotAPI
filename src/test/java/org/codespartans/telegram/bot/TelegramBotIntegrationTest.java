@@ -91,7 +91,10 @@ public class TelegramBotIntegrationTest {
     @Test
     public void sendMessage() throws IOException {
         TelegramBot bot = TelegramBot.getInstance(token);
-        Message message = bot.sendMessage(groupChatId, "Hello, this a integration test message.");
+        final String txt = "Hello, this a integration test message.";
+        Message message = bot.sendMessage(groupChatId, txt);
         Assert.assertNotNull(message);
+        Assert.assertEquals(message.getText(), txt);
+        Assert.assertNotNull(message.getFrom().getUsername());
     }
 }

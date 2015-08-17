@@ -15,24 +15,24 @@ public class Message {
     private int date;
     @JsonDeserialize(using = ChatDeserializer.class)
     private Chat chat;
-    private Optional<User> forward_from;
-    private Optional<Integer> forward_date;
-    private Optional<Message> reply_to_message;
+    private Optional<User> forward_from = Optional.empty();
+    private Optional<Integer> forward_date = Optional.empty();
+    private Optional<Message> reply_to_message = Optional.empty();
     private String text;
-    private Optional<Audio> audio;
-    private Optional<Document> document;
-    private Optional<List<PhotoSize>> photo;
-    private Optional<Sticker> sticker;
-    private Optional<Video> video;
-    private Optional<Contact> contact;
-    private Optional<Location> location;
-    private Optional<User> new_chat_participant;
-    private Optional<User> left_chat_participant;
-    private Optional<String> new_chat_title;
-    private Optional<List<PhotoSize>> new_chat_photo;
-    private Optional<Boolean> delete_chat_photo;
-    private Optional<Boolean> group_chat_created;
-    private Optional<String> caption;
+    private Optional<Audio> audio = Optional.empty();
+    private Optional<Document> document = Optional.empty();
+    private Optional<List<PhotoSize>> photo = Optional.empty();
+    private Optional<Sticker> sticker = Optional.empty();
+    private Optional<Video> video = Optional.empty();
+    private Optional<Contact> contact = Optional.empty();
+    private Optional<Location> location = Optional.empty();
+    private Optional<User> new_chat_participant = Optional.empty();
+    private Optional<User> left_chat_participant = Optional.empty();
+    private Optional<String> new_chat_title = Optional.empty();
+    private Optional<List<PhotoSize>> new_chat_photo = Optional.empty();
+    private Optional<Boolean> delete_chat_photo = Optional.empty();
+    private Optional<Boolean> group_chat_created = Optional.empty();
+    private Optional<String> caption = Optional.empty();
 
     public int getMessage_id() {
         return message_id;

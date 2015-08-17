@@ -8,9 +8,10 @@ import java.util.Optional;
 public class User implements Chat {
     private int id;
     private String first_name;
-    private Optional<String> last_name;
-    private Optional<String> username;
+    private Optional<String> last_name = Optional.empty();
+    private Optional<String> username = Optional.empty();
 
+    @Override
     public int getId() {
         return id;
     }

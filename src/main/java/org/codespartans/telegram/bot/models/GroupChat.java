@@ -7,6 +7,7 @@ public class GroupChat implements Chat {
     private int id;
     private String title;
 
+    @Override
     public int getId() {
         return id;
     }
