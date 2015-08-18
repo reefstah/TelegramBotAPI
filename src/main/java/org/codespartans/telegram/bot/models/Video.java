@@ -10,9 +10,9 @@ public class Video {
     private int width;
     private int height;
     private int duration;
-    private Optional<PhotoSize> thumb;
-    private Optional<String> mime_type;
-    private Optional<Integer> file_size;
+    private Optional<PhotoSize> thumb = Optional.empty();
+    private Optional<String> mime_type = Optional.empty();
+    private Optional<Integer> file_size = Optional.empty();
 
     public String getFile_id() {
         return file_id;

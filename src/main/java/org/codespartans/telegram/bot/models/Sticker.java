@@ -9,8 +9,8 @@ public class Sticker {
     private String file_id;
     private int width;
     private int height;
-    private Optional<PhotoSize> thumb;
-    private Optional<Integer> file_size;
+    private Optional<PhotoSize> thumb = Optional.empty();
+    private Optional<Integer> file_size = Optional.empty();
 
     public String getFile_id() {
         return file_id;

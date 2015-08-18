@@ -8,8 +8,8 @@ import java.util.Optional;
 public class Audio {
     private String file_id;
     private int duration;
-    private Optional<String> mime_type;
-    private Optional<Integer> file_size;
+    private Optional<String> mime_type = Optional.empty();
+    private Optional<Integer> file_size = Optional.empty();
 
     public String getFile_id() {
         return file_id;

@@ -11,7 +11,7 @@ import java.util.Optional;
  */
 public class ReplyKeyboardHide implements Reply {
     private boolean hide_keyboard = true;
-    private Optional<Boolean> selective;
+    private Optional<Boolean> selective = Optional.empty();
 
     public boolean isHide_keyboard() {
         return hide_keyboard;

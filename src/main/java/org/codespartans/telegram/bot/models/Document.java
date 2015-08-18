@@ -8,10 +8,10 @@ import java.util.Optional;
  */
 public class Document {
     private String file_id;
-    private Optional<PhotoSize> thumb;
-    private Optional<String> file_name;
-    private Optional<String> mime_type;
-    private Optional<Integer> file_size;
+    private Optional<PhotoSize> thumb = Optional.empty();
+    private Optional<String> file_name = Optional.empty();
+    private Optional<String> mime_type = Optional.empty();
+    private Optional<Integer> file_size = Optional.empty();
 
     public String getFile_id() {
         return file_id;

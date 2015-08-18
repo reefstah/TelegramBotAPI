@@ -9,7 +9,7 @@ import java.util.Optional;
  */
 public class ForceReply implements Reply {
     private boolean force_relpy = true;
-    private Optional<Boolean> selective;
+    private Optional<Boolean> selective = Optional.empty();
 
     public boolean isForce_relpy() {
         return force_relpy;

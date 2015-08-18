@@ -9,9 +9,9 @@ import java.util.Optional;
  */
 public class ReplyKeyboardMarkup implements Reply {
     private List<List<String>> keyboard;
-    private Optional<Boolean> resize_keyboard;
-    private Optional<Boolean> one_time_keyboard;
-    private Optional<Boolean> selective;
+    private Optional<Boolean> resize_keyboard = Optional.empty();
+    private Optional<Boolean> one_time_keyboard = Optional.empty();
+    private Optional<Boolean> selective = Optional.empty();
 
     public List<List<String>> getKeyboard() {
         return keyboard;
