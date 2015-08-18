@@ -623,6 +623,46 @@ public class TelegramBot {
 			.execute();
 	}
 
+	/**
+	 * Use this method to get a list of profile pictures for a user.
+	 *
+	 * @param user_id Unique identifier of the target user
+	 * @return Returns a <a href="https://core.telegram.org/bots/api#userprofilephotos">UserProfilePhotos</a> object.
+	 * @throws IOException
+	 */
+	public UserProfilePhotos getUserProfilePhotos(int user_id) throws IOException {
+		return getUserProfilePhotos(user_id, Optional.empty(), Optional.empty());
+	}
+
+	/**
+	 * Use this method to get a list of profile pictures for a user.
+	 *
+	 * @param user_id Unique identifier of the target user
+	 * @param offset  Sequential number of the first photo to be returned. By default, all photos are returned.
+	 * @param limit   Limits the number of photos to be retrieved. Values between 1—100 are accepted. Defaults to 100.
+	 * @return Returns a <a href="https://core.telegram.org/bots/api#userprofilephotos">UserProfilePhotos</a> object.
+	 * @throws IOException
+	 */
+	public UserProfilePhotos getUserProfilePhotos(int user_id, Optional<Integer> offset, Optional<Integer> limit) throws IOException {
+		final URI uri;
+
+		List<NameValuePair> nvps = new ArrayList<>(3);
+		nvps.add(new BasicNameValuePair("user_id", String.valueOf(user_id)));
+		offset.ifPresent(off -> nvps.add(new BasicNameValuePair("offset", String.valueOf(off))));
+		limit.ifPresent(lim -> nvps.add(new BasicNameValuePair("limit", String.valueOf(lim))));
+
+		try {
+			uri = new URIBuilder(ApiUri.resolve("getUserProfilePhotos")).addParameters(nvps).build();
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
+
+		return Request.Get(uri)
+				.execute()
+				.handleResponse(getResponseHandler(new TypeReference<Response<UserProfilePhotos>>() {
+				}));
+	}
+
 	private Message sendMedia(String method, int chat_id, File media) throws IOException {
 		return sendMedia(method, chat_id, media, Optional.empty(), Optional.empty(), Collections.emptyList());
 	}

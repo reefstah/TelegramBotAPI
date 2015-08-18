@@ -23,8 +23,8 @@ interface IntegrationTests { /* category marker */
 @Category(IntegrationTests.class)
 public class TelegramBotIntegrationTest {
 
-    private static final String token = System.getenv("token");
-    private static final int groupChatId = Integer.valueOf(System.getenv("groupChatId"));
+    private static final String TOKEN = System.getenv("TOKEN");
+    private static final int GROUP_CHAT_ID = Integer.valueOf(System.getenv("GROUP_CHAT_ID"));
 
     @Test(expected = NullPointerException.class)
     public void getInstanceWithNullToken() {
@@ -33,66 +33,66 @@ public class TelegramBotIntegrationTest {
 
     @Test
     public void getInstanceWithValidToken() {
-        TelegramBot bot = TelegramBot.getInstance(token);
+        TelegramBot bot = TelegramBot.getInstance(TOKEN);
         Assert.assertNotNull(bot);
     }
 
     @Test
     public void getMe() throws IOException, URISyntaxException {
-        TelegramBot bot = TelegramBot.getInstance(token);
+        TelegramBot bot = TelegramBot.getInstance(TOKEN);
         User user = bot.getMe();
         Assert.assertNotNull(user);
     }
 
     @Test
     public void getUpdatesWithoutParams() throws IOException {
-        TelegramBot bot = TelegramBot.getInstance(token);
+        TelegramBot bot = TelegramBot.getInstance(TOKEN);
         List<Update> updates = bot.getUpdates();
         Assert.assertNotNull(updates);
     }
 
     @Test
     public void getUpdatesWithTimeOut() throws IOException {
-        TelegramBot bot = TelegramBot.getInstance(token);
+        TelegramBot bot = TelegramBot.getInstance(TOKEN);
         List<Update> updates = bot.getUpdates(1);
         Assert.assertNotNull(updates);
     }
 
     @Test
     public void getUpdatesWithLimitAndOffset() throws IOException {
-        TelegramBot bot = TelegramBot.getInstance(token);
+        TelegramBot bot = TelegramBot.getInstance(TOKEN);
         List<Update> updates = bot.getUpdates(5, 5);
         Assert.assertNotNull(updates);
     }
 
     @Test
     public void sendPhoto() throws IOException {
-        TelegramBot bot = TelegramBot.getInstance(token);
+        TelegramBot bot = TelegramBot.getInstance(TOKEN);
         File file = new File(this.getClass().getResource("/5411648.png").getPath());
-        Message message = bot.sendPhoto(groupChatId, file, Optional.empty(), Optional.empty(), Optional.empty());
+        Message message = bot.sendPhoto(GROUP_CHAT_ID, file, Optional.empty(), Optional.empty(), Optional.empty());
         Assert.assertNotNull(message);
     }
 
     @Test
     public void sendDocument() throws IOException {
-        TelegramBot bot = TelegramBot.getInstance(token);
+        TelegramBot bot = TelegramBot.getInstance(TOKEN);
         File file = new File(this.getClass().getResource("/5411648.png").getPath());
-        Message message = bot.sendDocument(groupChatId, file);
+        Message message = bot.sendDocument(GROUP_CHAT_ID, file);
         Assert.assertNotNull(message);
     }
 
     @Test
     public void sendLocation() throws IOException {
-        TelegramBot bot = TelegramBot.getInstance(token);
-        Message message = bot.sendLocation(groupChatId, 52.3747157F, 4.8986142F);
+        TelegramBot bot = TelegramBot.getInstance(TOKEN);
+        Message message = bot.sendLocation(GROUP_CHAT_ID, 52.3747157F, 4.8986142F);
         Assert.assertNotNull(message);
     }
 
     @Test
     public void sendMessage() throws IOException {
-        TelegramBot bot = TelegramBot.getInstance(token);
+        TelegramBot bot = TelegramBot.getInstance(TOKEN);
         final String txt = "Hello, this a integration test message.";
-        Message message = bot.sendMessage(groupChatId, txt);
+        Message message = bot.sendMessage(GROUP_CHAT_ID, txt);
         Assert.assertNotNull(message);
         Assert.assertEquals(message.getText(), txt);
         Assert.assertNotNull(message.getFrom().getUsername());

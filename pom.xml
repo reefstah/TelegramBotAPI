@@ -93,8 +93,8 @@
                 <configuration>
                     <groups>org.codespartans.telegram.bot.IntegrationTests</groups>
                     <environmentVariables>
-                        <token>${env.TOKEN}</token>
-                        <groupChatId>${env.GROUPCHATID}</groupChatId>
+                        <TOKEN>${env.TOKEN}</TOKEN>
+                        <GROUP_CHAT_ID>${env.GROUP_CHAT_ID}</GROUP_CHAT_ID>
                     </environmentVariables>
                 </configuration>
             </plugin>
