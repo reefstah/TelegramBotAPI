@@ -1,5 +1,6 @@
 package org.codespartans.telegram.bot;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,7 +30,10 @@ import java.util.*;
  */
 public class TelegramBot {
 
-	private static final ObjectMapper mapper = new ObjectMapper().registerModule(new Jdk8Module());
+	private static final ObjectMapper mapper = new ObjectMapper()
+			.registerModule(new Jdk8Module())
+			.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+
 	private static final String HOST = "api.telegram.org";
 	private static final String SCHEME = "https";
 	private final URI ApiUri;

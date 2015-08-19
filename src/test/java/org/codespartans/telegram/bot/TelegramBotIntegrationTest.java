@@ -1,8 +1,6 @@
 package org.codespartans.telegram.bot;
 
-import org.codespartans.telegram.bot.models.Message;
-import org.codespartans.telegram.bot.models.Update;
-import org.codespartans.telegram.bot.models.User;
+import org.codespartans.telegram.bot.models.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -10,6 +8,7 @@ import org.junit.experimental.categories.Category;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -96,5 +95,18 @@ public class TelegramBotIntegrationTest {
         Assert.assertNotNull(message);
         Assert.assertEquals(message.getText(), txt);
         Assert.assertNotNull(message.getFrom().getUsername());
+    }
+
+    @Test
+    public void testReply() throws IOException {
+        TelegramBot bot = TelegramBot.getInstance(TOKEN);
+
+        Reply reply = new ReplyKeyboardMarkup()
+                .setKeyboard(Arrays.asList(Arrays.asList("Reply1", "Reply2"), Arrays.asList("Reply3", "Reply4")))
+                .setOne_time_keyboard(true);
+
+        Message message = bot.sendMessage(GROUP_CHAT_ID, "Testing reply options.", Optional.empty(), Optional.empty(), Optional.of(reply));
+
+        Assert.assertNotNull(message);
     }
 }

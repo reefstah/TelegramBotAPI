@@ -1,7 +1,6 @@
 package org.codespartans.telegram.bot.models;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * This object represents a <a href="https://core.telegram.org/bots#keyboards">custom keyboard</a> with reply options
@@ -9,9 +8,9 @@ import java.util.Optional;
  */
 public class ReplyKeyboardMarkup implements Reply {
     private List<List<String>> keyboard;
-    private Optional<Boolean> resize_keyboard = Optional.empty();
-    private Optional<Boolean> one_time_keyboard = Optional.empty();
-    private Optional<Boolean> selective = Optional.empty();
+    private boolean resize_keyboard = false;
+    private boolean one_time_keyboard = false;
+    private boolean selective = false;
 
     public List<List<String>> getKeyboard() {
         return keyboard;
@@ -22,29 +21,29 @@ public class ReplyKeyboardMarkup implements Reply {
         return this;
     }
 
-    public Optional<Boolean> getResize_keyboard() {
+    public boolean isResize_keyboard() {
         return resize_keyboard;
     }
 
-    public ReplyKeyboardMarkup setResize_keyboard(Optional<Boolean> resize_keyboard) {
+    public ReplyKeyboardMarkup setResize_keyboard(boolean resize_keyboard) {
         this.resize_keyboard = resize_keyboard;
         return this;
     }
 
-    public Optional<Boolean> getOne_time_keyboard() {
+    public boolean isOne_time_keyboard() {
         return one_time_keyboard;
     }
 
-    public ReplyKeyboardMarkup setOne_time_keyboard(Optional<Boolean> one_time_keyboard) {
+    public ReplyKeyboardMarkup setOne_time_keyboard(boolean one_time_keyboard) {
         this.one_time_keyboard = one_time_keyboard;
         return this;
     }
 
-    public Optional<Boolean> getSelective() {
+    public boolean isSelective() {
         return selective;
     }
 
-    public ReplyKeyboardMarkup setSelective(Optional<Boolean> selective) {
+    public ReplyKeyboardMarkup setSelective(boolean selective) {
         this.selective = selective;
         return this;
     }

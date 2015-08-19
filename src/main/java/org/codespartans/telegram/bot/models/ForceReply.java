@@ -1,7 +1,5 @@
 package org.codespartans.telegram.bot.models;
 
-import java.util.Optional;
-
 /**
  * Upon receiving a message with this object,
  * Telegram clients will display a reply interface to the user (act as if the user has selected the bot‘s message and tapped ’Reply').
@@ -9,22 +7,17 @@ import java.util.Optional;
  */
 public class ForceReply implements Reply {
     private boolean force_relpy = true;
-    private Optional<Boolean> selective = Optional.empty();
+    private boolean selective = false;
 
     public boolean isForce_relpy() {
         return force_relpy;
     }
 
-    public ForceReply setForce_relpy(boolean force_relpy) {
-        this.force_relpy = force_relpy;
-        return this;
-    }
-
-    public Optional<Boolean> getSelective() {
+    public boolean isSelective() {
         return selective;
     }
 
-    public ForceReply setSelective(Optional<Boolean> selective) {
+    public ForceReply setSelective(boolean selective) {
         this.selective = selective;
         return this;
     }

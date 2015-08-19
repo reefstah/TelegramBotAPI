@@ -1,7 +1,5 @@
 package org.codespartans.telegram.bot.models;
 
-import java.util.Optional;
-
 /**
  * Upon receiving a message with this object,
  * Telegram clients will hide the current custom keyboard and display the default letter-keyboard.
@@ -11,22 +9,17 @@ import java.util.Optional;
  */
 public class ReplyKeyboardHide implements Reply {
     private boolean hide_keyboard = true;
-    private Optional<Boolean> selective = Optional.empty();
+    private boolean selective = false;
 
     public boolean isHide_keyboard() {
         return hide_keyboard;
     }
 
-    public ReplyKeyboardHide setHide_keyboard(boolean hide_keyboard) {
-        this.hide_keyboard = hide_keyboard;
-        return this;
-    }
-
-    public Optional<Boolean> getSelective() {
+    public boolean isSelective() {
         return selective;
     }
 
-    public ReplyKeyboardHide setSelective(Optional<Boolean> selective) {
+    public ReplyKeyboardHide setSelective(boolean selective) {
         this.selective = selective;
         return this;
     }
