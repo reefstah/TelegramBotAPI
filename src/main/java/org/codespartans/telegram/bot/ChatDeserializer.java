@@ -14,7 +14,7 @@ import java.io.IOException;
 /**
  * Created by ralph on 26/07/15.
  */
-public class ChatDeserializer extends JsonDeserializer<Chat> {
+class ChatDeserializer extends JsonDeserializer<Chat> {
 
 	@Override
 	public Chat deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
