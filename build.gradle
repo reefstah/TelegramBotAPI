@@ -1,0 +1,42 @@
+apply plugin: "java"
+apply plugin: "eclipse"
+apply plugin: "idea"
+
+sourceCompatibility = "1.8"
+
+task wrapper(type: Wrapper) {
+	gradleVersion = "2.6"
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	compile(group: "org.apache.httpcomponents", name: "httpmime", version: "4.5")
+	compile(group: "org.apache.httpcomponents", name: "fluent-hc", version: "4.5")
+	compile(group: "com.fasterxml.jackson.core", name: "jackson-databind", version: "2.5.3")
+	compile(group: "com.fasterxml.jackson.datatype", name: "jackson-datatype-jdk8", version: "2.5.3")
+	testCompile(group: "junit", name: "junit", version: "4.12")
+}
+
+test {
+    useJUnit {
+        includeCategories "org.codespartans.telegram.bot.IntegrationTests"
+    }
+}
+
+tasks.withType(JavaCompile) {
+	options.encoding = "UTF-8"
+}
+
+jar {
+	from {
+		configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+	}
+	manifest {
+		attributes("Built-By": System.getProperty("user.name"),
+			"Implementation-URL": "https://github.com/Reefstah/TelegramBotAPI",
+			"Class-Path": configurations.runtime.collect({ "libs/" + it.getName() }).join(" "))
+	}
+}
