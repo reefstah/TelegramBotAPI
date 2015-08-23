@@ -45,11 +45,11 @@ public class MessageRequest {
         return this;
     }
 
-    public Message withBot(String token) throws IOException {
-        return withBot(TelegramBot.getInstance(token));
+    public Message fromBot(String token) throws IOException {
+        return fromBot(TelegramBot.getInstance(token));
     }
 
-    public Message withBot(TelegramBot bot) throws IOException {
+    public Message fromBot(TelegramBot bot) throws IOException {
         return bot.sendMessage(chat_id, text, disable_web_page_preview, reply_to_message_id, reply_markup);
     }
 }

@@ -30,5 +30,5 @@ public class AwesomoBot {
 SendMessage
         .to(YourChatIdHere)
         .withText("Sexy fluent TelegramBotAPI.")
-        .withBot(YourBotTokenHere);
+        .fromBot(YourBotTokenHere);
 ```

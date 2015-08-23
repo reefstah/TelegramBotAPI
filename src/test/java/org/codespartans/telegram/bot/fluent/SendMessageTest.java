@@ -20,6 +20,6 @@ public class SendMessageTest {
         SendMessage
                 .to(GROUP_CHAT_ID)
                 .withText("Sexy fluent TelegramBotAPI.")
-                .withBot(TOKEN);
+                .fromBot(TOKEN);
     }
 }
