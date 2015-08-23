@@ -233,7 +233,7 @@ public class Message {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("Message{");
+        final StringBuilder sb = new StringBuilder("MessageRequest{");
         sb.append("message_id=").append(message_id);
         sb.append(", from=").append(from);
         sb.append(", date=").append(date);

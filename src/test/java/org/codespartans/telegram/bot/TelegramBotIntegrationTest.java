@@ -12,13 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Created by ralph on 08/07/15.
- */
-
-interface IntegrationTests { /* category marker */
-}
-
 @Category(IntegrationTests.class)
 public class TelegramBotIntegrationTest {
 

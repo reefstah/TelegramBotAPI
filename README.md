@@ -1,5 +1,5 @@
 # TelegramBotAPI    [![Build Status](https://travis-ci.org/Reefstah/TelegramBotAPI.svg?branch=master)](https://travis-ci.org/Reefstah/TelegramBotAPI)
-A Java8 API for Telegram' s bot API
+The Java 8 implementation of Telegram's bot API.
 
 ## Example bot
 ```java
@@ -24,4 +24,11 @@ public class AwesomoBot {
         return this;
     }
 }
+```
+## Or try the fluent API
+```java
+SendMessage
+        .to(YourChatIdHere)
+        .withText("Sexy fluent TelegramBotAPI.")
+        .fromBot(YourBotTokenHere);
 ```
