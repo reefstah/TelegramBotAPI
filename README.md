@@ -25,3 +25,10 @@ public class AwesomoBot {
     }
 }
 ```
+## Or try the fluent API
+```java
+SendMessage
+        .to(YourChatIdHere)
+        .withText("Sexy fluent TelegramBotAPI.")
+        .withBot(YourBotTokenHere);
+```
