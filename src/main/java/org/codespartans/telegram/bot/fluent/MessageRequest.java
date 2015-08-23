@@ -11,11 +11,11 @@ import java.util.Optional;
  * Created by ralph on 23/08/15.
  */
 public class MessageRequest {
-    protected int chat_id;
-    protected String text;
-    protected Optional<Boolean> disable_web_page_preview = Optional.empty();
-    protected Optional<Integer> reply_to_message_id = Optional.empty();
-    protected Optional<Reply> reply_markup = Optional.empty();
+    private int chat_id;
+    private String text;
+    private Optional<Boolean> disable_web_page_preview = Optional.empty();
+    private Optional<Integer> reply_to_message_id = Optional.empty();
+    private Optional<Reply> reply_markup = Optional.empty();
 
     MessageRequest() {
     }

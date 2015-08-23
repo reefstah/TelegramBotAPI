@@ -1,6 +1,8 @@
 package org.codespartans.telegram.bot.fluent;
 
 import org.codespartans.telegram.bot.IntegrationTests;
+import org.codespartans.telegram.bot.models.Message;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -17,9 +19,14 @@ public class SendMessageTest {
 
     @Test
     public void sendMessage() throws IOException {
-        SendMessage
+        final String text = "Sexy fluent TelegramBotAPI.";
+        Message message = SendMessage
                 .to(GROUP_CHAT_ID)
-                .withText("Sexy fluent TelegramBotAPI.")
+                .withText(text)
                 .fromBot(TOKEN);
+
+        Assert.assertNotNull(message);
+        Assert.assertEquals(message.getText(), text);
+        Assert.assertEquals(message.getChat().getId(), GROUP_CHAT_ID);
     }
 }
