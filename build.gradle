@@ -4,9 +4,8 @@ apply plugin: "idea"
 
 sourceCompatibility = "1.8"
 
-task wrapper(type: Wrapper) {
-	gradleVersion = "2.6"
-}
+group "org.codespartans.telegram.bot"
+version "1.0.0-RELEASE"
 
 repositories {
 	mavenCentral()
@@ -22,7 +21,8 @@ dependencies {
 
 test {
     useJUnit {
-        includeCategories "org.codespartans.telegram.bot.IntegrationTests"
+        includeCategories("org.codespartans.telegram.bot.IntegrationTests")
+        includeCategories("org.codespartans.telegram.bot.fluent.FluentIntegrationTests")
     }
 }
 
@@ -30,13 +30,6 @@ tasks.withType(JavaCompile) {
 	options.encoding = "UTF-8"
 }
 
-jar {
-	from {
-		configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-	}
-	manifest {
-		attributes("Built-By": System.getProperty("user.name"),
-			"Implementation-URL": "https://github.com/Reefstah/TelegramBotAPI",
-			"Class-Path": configurations.runtime.collect({ "libs/" + it.getName() }).join(" "))
-	}
+task wrapper(type: Wrapper) {
+	gradleVersion = "2.6"
 }
