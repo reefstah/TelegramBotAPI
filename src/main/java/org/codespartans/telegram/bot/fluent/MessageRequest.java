@@ -35,8 +35,8 @@ public class MessageRequest {
         return this;
     }
 
-    public MessageRequest isReplyToMessage(int messageId) {
-        this.reply_to_message_id = Optional.of(messageId);
+    public MessageRequest isReplyToMessage(int chatId) {
+        this.reply_to_message_id = Optional.of(chatId);
         return this;
     }
 
