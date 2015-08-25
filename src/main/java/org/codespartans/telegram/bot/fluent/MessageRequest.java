@@ -10,7 +10,7 @@ import java.util.Optional;
 /**
  * Created by ralph on 23/08/15.
  */
-public class MessageRequest {
+public class MessageRequest implements To, ReplyToMessage, ReplyMarkup, FromBot {
     private int chat_id;
     private String text;
     private Optional<Boolean> disable_web_page_preview = Optional.empty();
