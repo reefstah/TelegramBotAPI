@@ -6,31 +6,34 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import java.io.File;
 import java.io.IOException;
 
 /**
- * Created by ralph on 24/08/15.
+ * Created by ralph on 26/08/15.
  */
 @Category({IntegrationTests.class, FluentIntegrationTests.class})
-public class SendPhotoTest {
+public class ForwardMessageTest {
 
     private static final String TOKEN = System.getenv("TOKEN");
     private static final int GROUP_CHAT_ID = Integer.valueOf(System.getenv("GROUP_CHAT_ID"));
 
     @Test
-    public void sendPhoto() throws IOException {
-        File file = new File(this.getClass().getResource("/5411648.png").getPath());
-        final String caption = "Fluently send photo.";
+    public void forwardMessage() throws IOException {
 
-        Message message = SendPhoto
+        final String text = "Message to be forwarded.";
+
+        Message msg = SendMessage
                 .to(GROUP_CHAT_ID)
-                .photo(file)
-                .withCaption(caption)
+                .withText(text)
                 .fromBot(TOKEN);
 
-        Assert.assertNotNull(message);
-        Assert.assertNotNull(message.getCaption());
-        Assert.assertEquals(message.getCaption().get(), caption);
+        Message fmsg = ForwardMessage
+                .to(GROUP_CHAT_ID)
+                .from(msg.getChat().getId())
+                .message(msg.getMessage_id())
+                .fromBot(TOKEN);
+
+        Assert.assertNotNull(fmsg);
+        Assert.assertEquals(fmsg.getText(), text);
     }
 }

@@ -8,6 +8,10 @@ import java.io.File;
  * Created by ralph on 24/08/15.
  */
 public class SendPhoto {
+
+    private SendPhoto() {
+    }
+
     public static SendPhotoRequest to(int chatId) {
         return new SendPhotoRequest().to(chatId);
     }
