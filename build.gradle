@@ -27,7 +27,7 @@ test {
         includeCategories("org.codespartans.telegram.bot.IntegrationTests")
         includeCategories("org.codespartans.telegram.bot.fluent.FluentIntegrationTests")
     }
-	environment = [TOKEN: TOKEN, GROUP_CHAT_ID: GROUP_CHAT_ID]
+	environment = [TOKEN: System.getenv("TOKEN"), GROUP_CHAT_ID: System.getenv("GROUP_CHAT_ID")]
 }
 
 tasks.withType(JavaCompile) {
