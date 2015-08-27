@@ -1,10 +1,13 @@
 apply plugin: "java"
 apply plugin: "eclipse"
 apply plugin: "idea"
+apply plugin: 'maven'
+apply plugin: 'signing'
 
 sourceCompatibility = "1.8"
 
 group "org.codespartans.telegram.bot"
+archivesBaseName = "telegram-bot-api"
 version "1.0.0-RELEASE"
 
 repositories {
@@ -24,12 +27,86 @@ test {
         includeCategories("org.codespartans.telegram.bot.IntegrationTests")
         includeCategories("org.codespartans.telegram.bot.fluent.FluentIntegrationTests")
     }
+	environment = [TOKEN: TOKEN, GROUP_CHAT_ID: GROUP_CHAT_ID]
 }
 
 tasks.withType(JavaCompile) {
 	options.encoding = "UTF-8"
 }
 
+tasks.withType(Javadoc) {
+	options.addStringOption('Xdoclint:none', '-quiet')
+}
+
 task wrapper(type: Wrapper) {
 	gradleVersion = "2.6"
+}
+
+task javadocJar(type: Jar) {
+	classifier = 'javadoc'
+	from javadoc
+}
+
+task sourcesJar(type: Jar) {
+	classifier = 'sources'
+	from sourceSets.main.allSource
+}
+
+tasks.withType(Javadoc) {
+	options.addStringOption('Xdoclint:none', '-quiet')
+}
+
+artifacts {
+	archives javadocJar, sourcesJar
+}
+
+signing {
+	sign configurations.archives
+}
+
+uploadArchives {
+	repositories {
+		mavenDeployer {
+			beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+			repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+				authentication(userName: ossrhUsername, password: ossrhPassword)
+			}
+
+			snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+				authentication(userName: ossrhUsername, password: ossrhPassword)
+			}
+
+			pom.project {
+				name 'TelegramBotAPI'
+				packaging 'jar'
+				description 'Java 8 API for Telegram\'s bot API'
+				url 'http://codespartans.org'
+
+				scm {
+					connection 'scm:git:git@github.com:Reefstah/TelegramBotAPI.git'
+					developerConnection 'scm:git:git@github.com:Reefstah/TelegramBotAPI.git'
+					url 'git@github.com:Reefstah/TelegramBotAPI.git'
+				}
+
+				licenses {
+					license {
+						name 'MIT License'
+						url 'http://www.opensource.org/licenses/mit-license.php'
+						distribution 'repo'
+					}
+				}
+
+				developers {
+					developer {
+						id 'reefstah'
+						name 'Ralph Broers'
+						email 'ralph@codespartans.com'
+						organization 'codespartans'
+						organizationUrl 'http://codespartans.org'
+					}
+				}
+			}
+		}
+	}
 }
