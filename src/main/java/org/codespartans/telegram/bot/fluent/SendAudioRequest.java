@@ -15,7 +15,7 @@ public class SendAudioRequest implements To, ReplyToMessage, ReplyMarkup, FromBo
     private int chat_id;
     private File audio;
     private String file_id;
-    private Optional<String> duration = Optional.empty();
+    private Optional<Integer> duration = Optional.empty();
     private Optional<Integer> reply_to_message_id = Optional.empty();
     private Optional<Reply> reply_markup = Optional.empty();
 
@@ -32,7 +32,7 @@ public class SendAudioRequest implements To, ReplyToMessage, ReplyMarkup, FromBo
         return this;
     }
 
-    public SendAudioRequest duration(String duration) {
+    public SendAudioRequest duration(int duration) {
         this.duration = Optional.of(duration);
         return this;
     }

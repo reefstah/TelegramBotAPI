@@ -19,7 +19,7 @@ public class SendAudio {
         return new SendAudioRequest().audio(audio);
     }
 
-    public static SendAudioRequest duration(String duration) {
+    public static SendAudioRequest duration(int duration) {
         return new SendAudioRequest().duration(duration);
     }
 

@@ -368,13 +368,13 @@ public class TelegramBot {
 	 * @throws IOException
 	 * @implNote Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
 	 */
-	public Message sendAudio(int chat_id, String audio, Optional<String> duration, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
+	public Message sendAudio(int chat_id, String audio, Optional<Integer> duration, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
 		if (duration == null)
 			throw new NullPointerException("Parameter duration cannot be null.");
 
 		final List<BasicNameValuePair> fields = new ArrayList<>(2);
 		fields.add(new BasicNameValuePair("audio", audio));
-		duration.map(drtn -> fields.add(new BasicNameValuePair("duration", drtn)));
+		duration.map(drtn -> fields.add(new BasicNameValuePair("duration", String.valueOf(drtn))));
 
 		return sendMessage("sendAudio", chat_id, fields, reply_to_message_id, reply_markup);
 	}
@@ -411,12 +411,12 @@ public class TelegramBot {
 	 * @throws IOException
 	 * @implNote Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
 	 */
-	public Message sendAudio(int chat_id, File audio, Optional<String> duration, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
+	public Message sendAudio(int chat_id, File audio, Optional<Integer> duration, Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
 		if (duration == null)
 			throw new NullPointerException("Parameter duration cannot be null.");
 
 		final List<BasicNameValuePair> extraFields = duration
-				.map(drtn -> Arrays.asList(new BasicNameValuePair("duration", drtn)))
+				.map(drtn -> Arrays.asList(new BasicNameValuePair("duration", String.valueOf(drtn))))
 				.orElseGet(Collections::emptyList);
 
 		return sendMedia("sendAudio", chat_id, audio, reply_to_message_id, reply_markup, extraFields);
