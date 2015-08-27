@@ -19,7 +19,7 @@ public class SendPhotoRequest implements To, ReplyToMessage, ReplyMarkup, FromBo
     private Optional<Integer> reply_to_message_id = Optional.empty();
     private Optional<Reply> reply_markup = Optional.empty();
 
-    public SendPhotoRequest() {
+    SendPhotoRequest() {
     }
 
     public SendPhotoRequest to(int chatId) {
