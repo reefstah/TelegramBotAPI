@@ -74,7 +74,7 @@ uploadArchives {
 			}
 
 			snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-				authentication(userName: System.getenv("ossrhUsername"), password: ossrhPassword)
+				authentication(userName: System.getenv("ossrhPassword"), password: ossrhPassword)
 			}
 
 			pom.project {
