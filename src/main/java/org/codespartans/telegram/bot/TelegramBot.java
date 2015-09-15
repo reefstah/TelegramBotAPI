@@ -728,7 +728,7 @@ public class TelegramBot {
         });
 
 		return Request.Post(ApiUri.resolve(method))
-				.bodyForm(params)
+				.bodyForm(params, StandardCharsets.UTF_8)
 				.execute()
                 .handleResponse(getResponseHandler(new TypeReference<Response<Message>>() {
                 }));
