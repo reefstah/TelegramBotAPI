@@ -7,6 +7,7 @@ import java.util.Optional;
  */
 public class User implements Chat {
     private int id;
+	private String type;
     private String first_name;
     private Optional<String> last_name = Optional.empty();
     private Optional<String> username = Optional.empty();
@@ -20,6 +21,15 @@ public class User implements Chat {
         this.id = id;
         return this;
     }
+    
+    @Override
+	public String getType() {
+		return type;
+	}
+	
+	public void setType(String type) {
+		this.type = type;
+	}
 
     public String getFirst_name() {
         return first_name;

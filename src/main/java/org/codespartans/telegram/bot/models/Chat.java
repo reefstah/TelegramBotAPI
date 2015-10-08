@@ -6,4 +6,6 @@ package org.codespartans.telegram.bot.models;
  */
 public interface Chat {
     int getId();
+    
+    String getType();
 }

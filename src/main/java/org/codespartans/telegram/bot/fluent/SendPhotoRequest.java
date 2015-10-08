@@ -11,7 +11,7 @@ import java.util.Optional;
 /**
  * Created by ralph on 24/08/15.
  */
-public class SendPhotoRequest implements To, ReplyToMessage, ReplyMarkup, FromBot {
+public class SendPhotoRequest implements To<Object>, ReplyToMessage<Object>, ReplyMarkup<Object>, FromBot {
     private int chat_id;
     private File photo;
     private String file_id;

@@ -91,7 +91,7 @@ public class TelegramBot {
 	 * @throws HttpResponseException
 	 */
 	public Message sendMessage(int chat_id, String text) throws IOException {
-		return sendMessage(chat_id, text, Optional.empty(), Optional.empty(), Optional.empty());
+		return sendMessage(chat_id, text, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
 	}
 
 	/**
@@ -99,6 +99,7 @@ public class TelegramBot {
 	 *
 	 * @param chat_id                  Unique identifier for the message recipient - User or GroupChat id
 	 * @param text                     Text of the message to be sent
+	 * @param parse_mode			   Send Markdown, if you want Telegram apps to show bold, italic and inline URLs in your bot's message. For the moment, only Telegram for Android supports this.
 	 * @param disable_web_page_preview Disables link previews for links in this message
 	 * @param reply_to_message_id      If the message is a reply, ID of the original message
 	 * @param reply_markup             Additional interface options.
@@ -108,9 +109,8 @@ public class TelegramBot {
 	 * @throws IOException
 	 * @throws HttpResponseException
 	 */
-	public Message sendMessage(int chat_id, String text, Optional<Boolean> disable_web_page_preview,
+	public Message sendMessage(int chat_id, String text, Optional<String> parse_mode, Optional<Boolean> disable_web_page_preview, 
 			Optional<Integer> reply_to_message_id, Optional<Reply> reply_markup) throws IOException {
-
 		if (text == null || disable_web_page_preview == null || reply_to_message_id == null || reply_markup == null)
 			throw new NullPointerException("No null params allowed in sendMessage.");
 
@@ -119,6 +119,7 @@ public class TelegramBot {
 
 		final List<BasicNameValuePair> fields = new ArrayList<>(2);
 		fields.add(new BasicNameValuePair("text", text));
+		parse_mode.map(parseMode -> fields.add(new BasicNameValuePair("parse_mode", parseMode)));
 		disable_web_page_preview.map(preview -> fields.add(new BasicNameValuePair("disable_web_page_preview", preview.toString())));
 
 		return sendMessage("sendMessage", chat_id, fields, reply_to_message_id, reply_markup);

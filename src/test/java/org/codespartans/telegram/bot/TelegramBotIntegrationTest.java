@@ -98,7 +98,7 @@ public class TelegramBotIntegrationTest {
                 .setKeyboard(Arrays.asList(Arrays.asList("Reply1", "Reply2"), Arrays.asList("Reply3", "Reply4")))
                 .setOne_time_keyboard(true);
 
-        Message message = bot.sendMessage(GROUP_CHAT_ID, "Testing reply options.", Optional.empty(), Optional.empty(), Optional.of(reply));
+        Message message = bot.sendMessage(GROUP_CHAT_ID, "Testing reply options.", Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(reply));
 
         Assert.assertNotNull(message);
     }
