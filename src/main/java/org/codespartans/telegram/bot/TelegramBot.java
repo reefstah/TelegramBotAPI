@@ -31,8 +31,8 @@ import java.util.*;
 public class TelegramBot {
 
 	private static final ObjectMapper mapper = new ObjectMapper()
-			.registerModule(new Jdk8Module())
-			.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+		.registerModule(new Jdk8Module())
+		.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
 
 	private static final String HOST = "api.telegram.org";
 	private static final String SCHEME = "https";
@@ -40,11 +40,11 @@ public class TelegramBot {
 
 	private TelegramBot(String token) throws URISyntaxException {
 		this.ApiUri = new URIBuilder()
-				.setScheme(SCHEME)
-				.setHost(HOST)
-				.setPath(String.format("/bot%s/", token))
-				.setCharset(StandardCharsets.UTF_8)
-				.build();
+			.setScheme(SCHEME)
+			.setHost(HOST)
+			.setPath(String.format("/bot%s/", token))
+			.setCharset(StandardCharsets.UTF_8)
+			.build();
 	}
 
 	/**
@@ -59,7 +59,7 @@ public class TelegramBot {
 	 */
 	public static TelegramBot getInstance(String token) {
 		token = Optional.ofNullable(token)
-				.orElseThrow(() -> new NullPointerException("Token can't be null."));
+			.orElseThrow(() -> new NullPointerException("Token can't be null."));
 		try {
 			return new TelegramBot(token);
 		} catch (URISyntaxException e) {
@@ -76,9 +76,8 @@ public class TelegramBot {
 	 */
 	public User getMe() throws IOException {
 		return Request.Get(ApiUri.resolve("getMe"))
-				.execute()
-				.handleResponse(getResponseHandler(new TypeReference<Response<User>>() {
-				}));
+			.execute()
+			.handleResponse(getResponseHandler(new TypeReference<Response<User>>() {}));
 	}
 
 	/**
@@ -236,10 +235,10 @@ public class TelegramBot {
 		url = Optional.ofNullable(url).orElseThrow(() -> new NullPointerException("Url can't be null."));
 
 		final StatusLine statusLine = Request.Post(ApiUri.resolve("setWebHook"))
-				.bodyForm(Arrays.asList(new BasicNameValuePair("url", url)))
-				.execute()
-				.returnResponse()
-				.getStatusLine();
+			.bodyForm(Arrays.asList(new BasicNameValuePair("url", url)), StandardCharsets.UTF_8)
+			.execute()
+			.returnResponse()
+			.getStatusLine();
 
 		if (statusLine.getStatusCode() != 200)
 			throw new HttpResponseException(statusLine.hashCode(), statusLine.getReasonPhrase());
@@ -265,10 +264,9 @@ public class TelegramBot {
 		params.add(new BasicNameValuePair("message_id", String.valueOf(message_id)));
 
 		return Request.Post(ApiUri.resolve("forwardMessage"))
-				.bodyForm(params)
-				.execute()
-                .handleResponse(getResponseHandler(new TypeReference<Response<Message>>() {
-                }));
+			.bodyForm(params, StandardCharsets.UTF_8)
+			.execute()
+            .handleResponse(getResponseHandler(new TypeReference<Response<Message>>() {}));
     }
 
 	/**
@@ -291,8 +289,8 @@ public class TelegramBot {
 			throw new NullPointerException("Parameter caption cannot be null.");
 
 		final List<BasicNameValuePair> extraFields = caption
-				.map(cptn -> Arrays.asList(new BasicNameValuePair("caption", cptn)))
-				.orElseGet(Collections::emptyList);
+			.map(cptn -> Arrays.asList(new BasicNameValuePair("caption", cptn)))
+			.orElseGet(Collections::emptyList);
 
 		return sendMedia("sendPhoto", chat_id, photo, reply_to_message_id, reply_markup, extraFields);
 	}
@@ -574,8 +572,8 @@ public class TelegramBot {
             throw new IllegalArgumentException("Latitude or longitude cannot be zero.");
 
 		final List<BasicNameValuePair> fields = Arrays.asList(
-				new BasicNameValuePair("latitude", String.valueOf(latitude)),
-				new BasicNameValuePair("longitude", String.valueOf(longitude)));
+			new BasicNameValuePair("latitude", String.valueOf(latitude)),
+			new BasicNameValuePair("longitude", String.valueOf(longitude)));
 
 		return sendMessage("sendLocation", chat_id, fields, reply_to_message_id, reply_markup);
 	}
@@ -594,8 +592,8 @@ public class TelegramBot {
             throw new IllegalArgumentException("Latitude or longitude cannot be zero.");
 
 		final List<BasicNameValuePair> fields = Arrays.asList(
-				new BasicNameValuePair("latitude", String.valueOf(latitude)),
-				new BasicNameValuePair("longitude", String.valueOf(longitude)));
+			new BasicNameValuePair("latitude", String.valueOf(latitude)),
+			new BasicNameValuePair("longitude", String.valueOf(longitude)));
 
 		return sendMessage("sendLocation", chat_id, fields);
 	}
@@ -624,8 +622,19 @@ public class TelegramBot {
 				new BasicNameValuePair("action", action.toString().toLowerCase()));
 
 		Request.Post(ApiUri.resolve("sendChatAction"))
-			.bodyForm(params)
+			.bodyForm(params, StandardCharsets.UTF_8)
 			.execute();
+	}
+	
+	public org.codespartans.telegram.bot.models.File getFile(String file_id) throws IOException {
+		if (file_id == null)
+			throw new IllegalArgumentException("Parameter file_id can't be null.");
+
+		final List<NameValuePair> params = Arrays.asList(new BasicNameValuePair("file_id", file_id));
+		return Request.Post(ApiUri.resolve("getFile"))
+			.bodyForm(params, StandardCharsets.UTF_8)
+			.execute()
+			.handleResponse(getResponseHandler(new TypeReference<Response<org.codespartans.telegram.bot.models.File>>() {}));
 	}
 
 	/**
@@ -651,7 +660,7 @@ public class TelegramBot {
 	public UserProfilePhotos getUserProfilePhotos(int user_id, Optional<Integer> offset, Optional<Integer> limit) throws IOException {
 		final URI uri;
 
-		List<NameValuePair> nvps = new ArrayList<>(3);
+		final List<NameValuePair> nvps = new ArrayList<>(3);
 		nvps.add(new BasicNameValuePair("user_id", String.valueOf(user_id)));
 		offset.ifPresent(off -> nvps.add(new BasicNameValuePair("offset", String.valueOf(off))));
 		limit.ifPresent(lim -> nvps.add(new BasicNameValuePair("limit", String.valueOf(lim))));
@@ -663,9 +672,8 @@ public class TelegramBot {
 		}
 
 		return Request.Get(uri)
-				.execute()
-				.handleResponse(getResponseHandler(new TypeReference<Response<UserProfilePhotos>>() {
-				}));
+			.execute()
+			.handleResponse(getResponseHandler(new TypeReference<Response<UserProfilePhotos>>() {}));
 	}
 
 	private Message sendMedia(String method, int chat_id, File media) throws IOException {
@@ -699,10 +707,9 @@ public class TelegramBot {
 		extraFields.stream().forEach(field -> entityBuilder.addTextBody(field.getName(), field.getValue()));
 
 		return Request.Post(ApiUri.resolve(method))
-				.body(entityBuilder.build())
-				.execute()
-                .handleResponse(getResponseHandler(new TypeReference<Response<Message>>() {
-                }));
+			.body(entityBuilder.build())
+			.execute()
+            .handleResponse(getResponseHandler(new TypeReference<Response<Message>>() {}));
     }
 
 	private Message sendMessage(String method, int chat_id, List<BasicNameValuePair> fields) throws IOException {
@@ -729,10 +736,9 @@ public class TelegramBot {
         });
 
 		return Request.Post(ApiUri.resolve(method))
-				.bodyForm(params, StandardCharsets.UTF_8)
-				.execute()
-                .handleResponse(getResponseHandler(new TypeReference<Response<Message>>() {
-                }));
+			.bodyForm(params, StandardCharsets.UTF_8)
+			.execute()
+            .handleResponse(getResponseHandler(new TypeReference<Response<Message>>() {}));
     }
 
 	private List<Update> getUpdates(List<NameValuePair> nvps) throws IOException {
@@ -745,9 +751,8 @@ public class TelegramBot {
 		}
 
 		return Request.Get(uri)
-				.execute()
-                .handleResponse(getResponseHandler(new TypeReference<Response<List<Update>>>() {
-                }));
+			.execute()
+            .handleResponse(getResponseHandler(new TypeReference<Response<List<Update>>>() {}));
     }
 
 	private <T> ResponseHandler<T> getResponseHandler(TypeReference<Response<T>> reference) {
