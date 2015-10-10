@@ -5,13 +5,12 @@ import java.util.Optional;
 /**
  * This object represents a Telegram user or bot.
  */
-public class User implements Chat {
+public class User {
     private int id;
     private String first_name;
     private Optional<String> last_name = Optional.empty();
     private Optional<String> username = Optional.empty();
 
-    @Override
     public int getId() {
         return id;
     }
