@@ -11,7 +11,7 @@ import java.util.Optional;
 /**
  * Created by ralph on 27/08/15.
  */
-public class SendAudioRequest implements To<Object>, ReplyToMessage<Object>, ReplyMarkup<Object>, FromBot {
+public class SendAudioRequest implements To, ReplyToMessage<Object>, ReplyMarkup<Object>, FromBot {
     private int chat_id;
     private File audio;
     private String file_id;

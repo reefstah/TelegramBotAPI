@@ -8,7 +8,7 @@ import java.io.IOException;
 /**
  * Created by ralph on 26/08/15.
  */
-public class ForwardMessageRequest implements To<Object>, FromBot {
+public class ForwardMessageRequest implements To, FromBot {
 
     private int chat_id;
     private int from_chat_id;
